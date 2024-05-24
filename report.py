@@ -210,39 +210,3 @@ class tab:
     def combo(self):
         with self.tab, self.stTab:
             yield
-
-# Application testing...
-def main():
-    r = report()
-    r.write('# Hello World')
-    r.write("# This is a test")
-
-    with r.sidebar:
-        options = ['a', 'b', 'c', 'd', 'e']
-        r.selectbox("These are some options", options = options, index = 2)
-    
-    # Sidebar testing...
-    with r.sidebar:
-        r.write("Hello world")
-
-    # Chart testing
-    import altair as alt
-    import polars as pl
-    df = pl.DataFrame(
-        {
-            'x' : [n for n in range(1000)],
-            'y' : [n**2 for n in range(1000)]
-        }
-    )
-    chart = alt.Chart(df.to_pandas()).mark_line().encode(
-        x = 'x', y = 'y'
-    )
-    r.altair_chart(chart)
-    r.altair_chart(chart)
-    r.altair_chart(chart)
-
-    # Download
-    r.download()
-
-if __name__ == '__main__':
-    main()
