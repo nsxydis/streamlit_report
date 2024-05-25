@@ -49,8 +49,7 @@ directly from users through a web platform.'''
     )
 
     # Select breakdown criteria
-    options = [item for item in range(1, 10)]
-    number = r.selectbox("Number of charts", options = options)
+    number = r.slider("Number of charts", min_value = 1, max_value = 20, step = 1)
 
     # Note what the tabs do
     r.write("# These tabs can be clicked to display content")
@@ -76,6 +75,11 @@ directly from users through a web platform.'''
         with tabs[n][0]:
             mainFeature = r.selectbox("Main feature", key = f'main_{n}', options = cols)
             secondaryFeature = r.selectbox("Secondary feature", key = f'secondary_{n}', options = cols)
+
+            # Make sure we got different features to prevent errors
+            if mainFeature == secondaryFeature:
+                r.write("You'll need to select different features to generate charts")
+                continue
             
             # Create the selection
             selection = alt.selection_point(fields = [mainFeature])
