@@ -90,8 +90,11 @@ class Report:
 
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {value}{self.reportLabel}")
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
             self.html.write(f"{value}")
+
+        # Return the slider output
+        return value
 
     @property
     @contextmanager 
