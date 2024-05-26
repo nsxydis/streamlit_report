@@ -12,7 +12,7 @@ The below features are simplified representations of what the dashboard presents
 - [x] _streamlit.tabs_ support using **with** generator functions
 - [x] _streamlit.sidebar_ support using **with** generator functions
 - [ ] _streamlit.cols_ support using **with** generator functions
-- [ ] multi-page app support
+- [x] multi-page app support
 - [x] _streamlit.altair_chart_ support
 - [x] _streamlit_report.Report.ignore_ flag to temporarily suppress writing to the report file
 - [x] _streamlit.dataframe_ support, displaying a polars or pandas dataframe in a sized window
