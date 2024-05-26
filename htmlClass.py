@@ -30,14 +30,16 @@ class html:
         self.body = {}              # Dictionary of body code for each page
         self.sidebar = {}           # Dictionary for sidebar code
         self.chartScript = {}       # Dictionary for chart scripts
+        self.pageNames = {}         # Names of each page associated with a page number
         
         self.charts = 0             # Chart counter
         self.altairCharts = False   # Chart boolean
         self.side = False           # If true, writes to the sidebar
         self.lineBreak = True       # If true, puts a break between certain elements (charts, dataframes...)
 
-        # Tab and 
+        # Tab and page counts
         self.page = 1               # The current page number
+        self.pageName = ''          # Name of the current page
         self.tabCount = 0           # Current tab count
         self.tabGroup = 0           # Current tab group
 
@@ -59,14 +61,18 @@ class html:
         # Reset trigger variables
         self.altairCharts = False
 
-    def increment(self, page: 'int' = None):
+    def increment(self, allowDuplicates : 'bool' = False):
         '''Increments the page or goes to the given page and clears its content'''
-        # Navigate to the target page
-        if page:
-            self.page = page
-        else:
-            self.page += 1
-
+        # If we're allowing duplicates or have a new page...
+        if allowDuplicates == True or self.pageName not in self.pageNames:
+            self.page = len(self.pageNames) + 1
+            self.pageNames[self.pageName] = self.page
+        
+        # Otherwise, the tab already exists and needs to be overwritten
+        elif allowDuplicates == False:
+            # Navigate to this page
+            self.page = self.pageNames[self.pageName]
+        
         # Clear and/or initialize the page
         self.clear()
 
@@ -116,14 +122,15 @@ class html:
 
     def tabBar(self, items: 'list', vTab = False):
         '''Creates a tab bar with buttons for each item in the list'''
+        # Field to trigger disabling the sidebar at the end of the function
+        disable = False
+
         # Add a v if we're making a vertical tab (multipage app)
         if vTab:
             v = 'v'
 
             # Keep track of whether or not to disable the sidebar
-            if self.sidebar:
-                disable = False
-            else:
+            if self.sidebar == False:
                 self.sidebar = True
                 disable = True
         
@@ -132,7 +139,7 @@ class html:
             v = ''
 
         # Open the div element
-        self.body[self.page] += f'<div class = "{v}tab">\n'
+        self.html(f'<div class = "{v}tab">\n')
 
         # Increment the tab group
         self.tabGroup += 1
@@ -140,12 +147,13 @@ class html:
         # Add each of the tabs
         for item in items:
             self.tabCount += 1
-            self.body[self.page] += f'''
+            code = f'''
             <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
             onclick = "openTab(event, {self.page}, {self.tabGroup}, 'page_{self.page}_{item}_{self.tabCount}')">{item}</button>'''
+            self.html(code)
 
         # Close the element
-        self.body[self.page] += '</div>'
+        self.html('</div>')
 
         # If we need to, disable the sidebar
         if disable:
