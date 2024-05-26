@@ -360,9 +360,9 @@ class html:
             display = ''
             if len(self.pageOrder) > 0:
                 if name == self.pageOrder[0]:
-                    display += 'display: block"'
+                    display += 'style = "display: block"'
                 else:
-                    display += 'display: none"'
+                    display += 'style = "display: none"'
             else:
                 display = ''
 
