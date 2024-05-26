@@ -133,12 +133,66 @@ class html:
             self.tabCount += 1
             code = f'''
             <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
-            onclick = "openTab(event, {self.page}, {self.tabGroup}, 'page_{self.page}_{item}_{self.tabCount}')">{item}</button>'''
+            onclick = "openTab( event, {self.page}, {self.tabGroup}, 
+                                'page_{self.page}_{item}_{self.tabCount}')">
+                {item}
+            </button>
+            '''
             self.html(code)
 
         # Close the element
-        self.html('</div>')
+        self.html('</div>\n')
 
+    def pageTabs(self, order: 'list' = None):
+        '''Adds the pages to the sidebar in the order generated or in an order specified
+        NOTE: The order is a list of the page names, not the page numbers as those can change
+        NOTE: This code is similar but functionally different to the tabBar function'''
+        # If the sidebar is not active, then we'll disable it after this function
+        disable = False
+        if self.sidebar == False:
+            disable = True
+            self.sidebar = True
+
+        # Open the div element
+        self.html(f'<div class = "vtab">\n')
+
+        # Increment the tab group
+        self.tabGroup += 1
+
+        # Determine the order to create the tabs
+        pageOrder = []
+
+        # Start with the provided order
+        if order:
+            for item in order:
+                # Only add the item to our page tabs if it exists in our data
+                if item in self.pageNames:
+                    pageOrder.append(item)
+
+        # Add any remaining tabs in the order they were generated
+        for item in self.pageNames:
+            if item not in pageOrder:
+                pageOrder.append(item)
+
+        # Add a tab for each page
+        for item in pageOrder:
+            self.tabCount += 1
+            code = f'''
+            <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
+            onclick = "openTab( event, {self.page}, {self.tabGroup}, 
+                                'page_{self.page}_{item}_{self.tabCount}')">
+                {item}
+            </button>
+            '''
+            self.html(code)
+
+        # Close the element
+        self.html('</div>\n')
+
+        # Disable the sidebar, if we need to
+        if disable:
+            self.sidebar = False
+            
     def altairHeader(self):
         '''Optional code to add to the header if we're using altair charts'''
         import altair as alt
@@ -223,9 +277,13 @@ class html:
         # Write the code
         self.html(code)
 
-    def generateReport(self):
+    def generateReport(self, order = None):
         # Create the main body block
         self.main = '<body>'
+
+        # If we have multiple pages, add their buttons to the sidebar
+        if len(self.pageNames) > 1:
+            self.pageTabs(order)
 
         # TODO: Make the sidebar code work for multipage apps
         # NOTE: For now just force everything onto the same sidebar
