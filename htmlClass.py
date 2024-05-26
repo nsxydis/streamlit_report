@@ -31,6 +31,7 @@ class html:
         self.sidebar = {}           # Dictionary for sidebar code
         self.chartScript = {}       # Dictionary for chart scripts
         self.pageNames = {}         # Names of each page associated with a page number
+        self.pageOrder = []         # Order that the pages should be displayed in
         
         self.charts = 0             # Chart counter
         self.altairCharts = False   # Chart boolean
@@ -116,6 +117,43 @@ class html:
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
         }
+
+        // Set the width of the side navigation to 250px and the left margin of the page content to 250px
+        var k, contentPages;
+
+        // Get all the pages with content on them
+        contentPages = document.getElementsByClassName("content");
+
+        function openNav() {
+        // Open the Navigation window
+        document.getElementById("pageNav").style.width = "250px";
+        
+        // Adjust the margin for all the content pages
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.marginLeft = "250px";    
+            }
+        }
+
+        // Set the width of the side navigation to 0 and the left margin of the page content to 0
+        function closeNav() {
+        document.getElementById("pageNav").style.width = "0";
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.marginLeft = "0";    
+            }
+        } 
+
+        // Functions to switch between pages
+        function openPage (evt, page_id) {
+        // Clear the display for all pages
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.display = "none";
+        }
+
+        // Display the page that was clicked on
+        document.getElementById(page_id).style.display = "block";
+
+        }
+
         </script>
         '''
         return code
@@ -147,51 +185,40 @@ class html:
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
         NOTE: This code is similar but functionally different to the tabBar function'''
-        # If the sidebar is not active, then we'll disable it after this function
-        disable = False
-        if self.sidebar == False:
-            disable = True
-            self.sidebar = True
-
         # Open the div element
-        self.html(f'<div class = "vtab">\n')
+        code = f'<div id = "pageNav" class = "sidenav">\n'
 
         # Increment the tab group
         self.tabGroup += 1
 
         # Determine the order to create the tabs
-        pageOrder = []
+        self.pageOrder = []
 
         # Start with the provided order
         if order:
             for item in order:
                 # Only add the item to our page tabs if it exists in our data
                 if item in self.pageNames:
-                    pageOrder.append(item)
+                    self.pageOrder.append(item)
 
         # Add any remaining tabs in the order they were generated
         for item in self.pageNames:
-            if item not in pageOrder:
-                pageOrder.append(item)
+            if item not in self.pageOrder:
+                self.pageOrder.append(item)
 
         # Add a tab for each page
-        for item in pageOrder:
+        for item in self.pageOrder:
             self.tabCount += 1
-            code = f'''
-            <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
-            onclick = "openTab( event, {self.page}, {self.tabGroup}, 
-                                'page_{self.page}_{item}_{self.tabCount}')">
+            code += f'''
+            <a href = "#{item}" class = "page_link" 
+            onclick = 'openPage( event, "{item}_{self.pageNames[item]}")'>
                 {item}
-            </button>
+            </a>
             '''
-            self.html(code)
 
         # Close the element
-        self.html('</div>\n')
-
-        # Disable the sidebar, if we need to
-        if disable:
-            self.sidebar = False
+        code += '</div>\n'
+        return code
             
     def altairHeader(self):
         '''Optional code to add to the header if we're using altair charts'''
@@ -279,23 +306,45 @@ class html:
 
     def generateReport(self, order = None):
         # Create the main body block
-        self.main = '<body>'
+        self.main = '<body>\n'
 
         # If we have multiple pages, add their buttons to the sidebar
         if len(self.pageNames) > 1:
-            self.pageTabs(order)
+            self.main = '<body onload = "openNav()">\n'
+            self.main += self.pageTabs(order)
 
         # TODO: Make the sidebar code work for multipage apps
         # NOTE: For now just force everything onto the same sidebar
-        self.main += '<div class = "sidebar">\n'
-        for item in self.sidebar:
-            self.main += self.sidebar[item] + '\n'
-        self.main += '</div>'
+        # self.main += '<div class = "sidebar">\n'
+        # for item in self.sidebar:
+        #     self.main += self.sidebar[item] + '\n'
+        # self.main += '</div>'
 
         # TODO: Make the body code work for multipage apps
         for item in self.body:
+            # Get the name of the page if we have multiple pages
+            pageName = None
+            for name in self.pageNames:
+                if item == self.pageNames[name]:
+                    pageName = name
+                    break
+            
+            if pageName:
+                pageID = f'id = "{pageName}_{item}"'
+            else:
+                pageID = ''
+
+            try:
+                # Display the primary tab in the tab order by default
+                if pageName == self.pageOrder[0]:
+                    display = '''style = "margin-left: 0; display: block"'''
+                else:
+                    display = '''style = "margin-left: 0; display: none"'''
+            except:
+                display = ''
+
             self.main += f'''
-            <div class = "content"> 
+            <div class = "content" {pageID} {display}> 
                 {self.body[item]}
             </div>'''
         
