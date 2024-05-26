@@ -40,6 +40,7 @@ class Report:
         self.init('htmlReport', False)
         self.init('html', htmlClass.html())
         self.duplicatePages = duplicatePages
+        self.order = None
 
         # If we already have an html report going, preserve it
         self.html = self.ss.html
@@ -186,6 +187,10 @@ class Report:
 
     def download(self, reportName = 'output'):
         '''Runs the application and downloads the html'''
+        # If we have a page order, pass it to the html class
+        if self.order:
+            self.html.pageOrder = self.order
+
         if self.ss['htmlReport'] == True:
             # Make the report...
             self.html.generateReport()
