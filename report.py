@@ -22,8 +22,16 @@ import streamlit as st
 import htmlClass
 from contextlib import contextmanager
 
+# Code to get the page name
+from st_pages import get_pages, get_script_run_ctx 
+
+
 class Report:
-    def __init__(self):
+    def __init__(self, duplicatePages: 'bool' = False):
+        '''
+        duplicatePages: Allow for the program to create multiple pages for 
+                        files that have the same name.
+        '''
         # Session_state shorthand
         self.session_state = st.session_state
         self.ss = self.session_state
@@ -31,12 +39,17 @@ class Report:
         # Inititialization
         self.init('htmlReport', False)
         self.init('html', htmlClass.html())
+        self.duplicatePages = duplicatePages
+        self.order = None
 
         # If we already have an html report going, preserve it
         self.html = self.ss.html
 
-        # Clear the page data if we're regenerating though
-        self.html.clear()
+        # Get and store the name of the current page
+        self.html.pageName = self.pageName()
+
+        # Clear the page data if we're regenerating the code
+        self.html.increment(self.duplicatePages)
 
         # Option to ignore fields from the report
         self.ignore = False
@@ -51,6 +64,22 @@ class Report:
         '''Initializes the session state with the given information'''
         if variable not in self.ss:
             self.ss[variable] = value
+
+    def pageName(self):
+        '''Gets and returns the filename of the running page'''
+        # Code from blackary in discussion link below...
+        # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
+        pages = get_pages("")
+        ctx = get_script_run_ctx()
+
+        try:
+            current_page = pages[ctx.page_script_hash]
+        except KeyError:
+            current_page = [
+                p for p in pages.values() if p["relative_page_hash"] == ctx.page_script_hash
+            ][0]
+
+        return current_page['page_name']
 
     def write(self, text, **kwargs):
         '''Mimics st.write'''
@@ -158,6 +187,10 @@ class Report:
 
     def download(self, reportName = 'output'):
         '''Runs the application and downloads the html'''
+        # If we have a page order, pass it to the html class
+        if self.order:
+            self.html.pageOrder = self.order
+
         if self.ss['htmlReport'] == True:
             # Make the report...
             self.html.generateReport()

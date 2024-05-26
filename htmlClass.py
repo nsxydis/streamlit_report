@@ -30,14 +30,17 @@ class html:
         self.body = {}              # Dictionary of body code for each page
         self.sidebar = {}           # Dictionary for sidebar code
         self.chartScript = {}       # Dictionary for chart scripts
+        self.pageNames = {}         # Names of each page associated with a page number
+        self.pageOrder = []         # Order that the pages should be displayed in
         
         self.charts = 0             # Chart counter
         self.altairCharts = False   # Chart boolean
         self.side = False           # If true, writes to the sidebar
         self.lineBreak = True       # If true, puts a break between certain elements (charts, dataframes...)
 
-        # Tab and 
+        # Tab and page counts
         self.page = 1               # The current page number
+        self.pageName = ''          # Name of the current page
         self.tabCount = 0           # Current tab count
         self.tabGroup = 0           # Current tab group
 
@@ -59,14 +62,18 @@ class html:
         # Reset trigger variables
         self.altairCharts = False
 
-    def increment(self, page: 'int' = None):
+    def increment(self, allowDuplicates : 'bool' = False):
         '''Increments the page or goes to the given page and clears its content'''
-        # Navigate to the target page
-        if page:
-            self.page = page
-        else:
-            self.page += 1
-
+        # If we're allowing duplicates or have a new page...
+        if allowDuplicates == True or self.pageName not in self.pageNames:
+            self.page = len(self.pageNames) + 1
+            self.pageNames[self.pageName] = self.page
+        
+        # Otherwise, the tab already exists and needs to be overwritten
+        elif allowDuplicates == False:
+            # Navigate to this page
+            self.page = self.pageNames[self.pageName]
+        
         # Clear and/or initialize the page
         self.clear()
 
@@ -110,6 +117,65 @@ class html:
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
         }
+
+        // Set the width of the side navigation to 250px and the left margin of the page content to 250px
+        var k, contentPages, sidebarContent;
+
+        // Get all the pages with content & sidebar content on them
+        contentPages = document.getElementsByClassName("content");
+        sidebarContent = document.getElementsByClassName("sidebar");
+
+        function openNav() {
+        // Open the Navigation window
+        document.getElementById("pageNav").style.width = "250px";
+        
+        // Open the sidebars
+        for (k = 0; k < sidebarContent.length; k ++) {
+            sidebarContent[k].style.width = "250px";
+        }
+
+        // Adjust the margin for all the content pages
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.marginLeft = "250px";    
+            }
+        }
+
+        // Set the width of the side navigation to 0 and the left margin of the page content to 0
+        function closeNav() {
+        // Close the Page Navigation bar
+        document.getElementById("pageNav").style.width = "0";
+
+        // Close the sidebars
+        for (k = 0; k < sidebarContent.length; k ++) {
+            sidebarContent[k].style.width = "0";
+            sidebarContent[k].style.marginLeft = "0";
+        }
+
+
+        // Move all the content windows over
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.marginLeft = "0";    
+            }
+        } 
+
+        // Functions to switch between pages
+        function openPage (evt, page_id) {
+        // Clear the content display for all pages
+        for (k = 0; k < contentPages.length; k ++) {
+            contentPages[k].style.display = "none";
+        }
+
+        // Clear the sidebar content display for all pages
+        for (k = 0; k < sidebarContent.length; k ++) {
+            sidebarContent[k].style.display = "none";
+        }
+
+        // Display the page that was clicked on
+        document.getElementById(page_id).style.display = "block";
+        document.getElementById(page_id + "_sidebar").style.display = "block";
+
+        }
+
         </script>
         '''
         return code
@@ -117,7 +183,7 @@ class html:
     def tabBar(self, items: 'list'):
         '''Creates a tab bar with buttons for each item in the list'''
         # Open the div element
-        self.body[self.page] += '<div class = "tab">\n'
+        self.html(f'<div class = "tab">\n')
 
         # Increment the tab group
         self.tabGroup += 1
@@ -125,13 +191,57 @@ class html:
         # Add each of the tabs
         for item in items:
             self.tabCount += 1
-            self.body[self.page] += f'''
+            code = f'''
             <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
-            onclick = "openTab(event, {self.page}, {self.tabGroup}, 'page_{self.page}_{item}_{self.tabCount}')">{item}</button>'''
+            onclick = "openTab( event, {self.page}, {self.tabGroup}, 
+                                'page_{self.page}_{item}_{self.tabCount}')">
+                {item}
+            </button>
+            '''
+            self.html(code)
 
         # Close the element
-        self.body[self.page] += '</div>'
+        self.html('</div>\n')
 
+    def pageTabs(self, order: 'list' = None):
+        '''Adds the pages to the sidebar in the order generated or in an order specified
+        NOTE: The order is a list of the page names, not the page numbers as those can change
+        NOTE: This code is similar but functionally different to the tabBar function'''
+        # Initialize
+        code = ''
+
+        # Increment the tab group
+        self.tabGroup += 1
+
+        # Determine the order to create the tabs
+        self.pageOrder = []
+
+        # Start with the provided order
+        if order:
+            for item in order:
+                # Only add the item to our page tabs if it exists in our data
+                if item in self.pageNames:
+                    self.pageOrder.append(item)
+
+        # Add any remaining tabs in the order they were generated
+        for item in self.pageNames:
+            if item not in self.pageOrder:
+                self.pageOrder.append(item)
+
+        # Add a tab for each page
+        for item in self.pageOrder:
+            self.tabCount += 1
+            code += f'''
+            <a href = "#{item}" class = "page_link" 
+            onclick = 'openPage( event, "{item}_{self.pageNames[item]}")'>
+                {item}
+            </a>
+            '''
+
+        # Close the element
+        # code += '</div>\n'
+        return code
+            
     def altairHeader(self):
         '''Optional code to add to the header if we're using altair charts'''
         import altair as alt
@@ -216,21 +326,71 @@ class html:
         # Write the code
         self.html(code)
 
-    def generateReport(self):
+    def pName(self, number):
+        '''For the given page number, returns the page name'''
+        # Default value is None
+        n = None
+        
+        # Loop through all the pages we collected data for
+        for name in self.pageNames:
+            if number == self.pageNames[name]:
+                n = name
+                break
+
+        # Return the page name
+        return n
+
+    def generateReport(self, order = None):
         # Create the main body block
-        self.main = '<body>'
+        self.main = '''<body onload = "openNav()">
+        <div id = "pageNav" class = "sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        '''
 
-        # TODO: Make the sidebar code work for multipage apps
-        # NOTE: For now just force everything onto the same sidebar
-        self.main += '<div class = "sidebar">\n'
+        # If we have multiple pages, add their buttons to the sidebar
+        if len(self.pageNames) > 1:
+            self.main += self.pageTabs(order)
+
+        # NOTE: Sidebar now is grouped with sidenav by default
         for item in self.sidebar:
-            self.main += self.sidebar[item] + '\n'
-        self.main += '</div>'
+            # Get the name of the page if we have multiple pages
+            name = self.pName(item)
+            barID = f'id = "{name}_{item}_sidebar"' if name else ''
 
-        # TODO: Make the body code work for multipage apps
+            display = ''
+            if len(self.pageOrder) > 0:
+                if name == self.pageOrder[0]:
+                    display += 'style = "display: block"'
+                else:
+                    display += 'style = "display: none"'
+            else:
+                display = ''
+
+            # Add each item to the sidenav
+            self.main += f'<div class = "sidebar" {barID} {display}>\n'
+
+            self.main += self.sidebar[item] + '\n'
+            self.main += '</div>'
+
+        # Close the sidenav block
+        self.main += '</div>\n'
+
         for item in self.body:
+            # Get the name of the page if we have multiple pages
+            name = self.pName(item)
+            id = f'id = "{name}_{item}"' if name else ''
+
+            display = 'style = "margin-left: 0;'
+            if len(self.pageOrder) > 0:
+                if name == self.pageOrder[0]:
+                    display += 'display: block"'
+                else:
+                    display += 'display: none"'
+            else:
+                display = ''
+            
             self.main += f'''
-            <div class = "content"> 
+            <div class = "content" {id} {display}> 
                 {self.body[item]}
             </div>'''
         

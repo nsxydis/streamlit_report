@@ -1,4 +1,5 @@
 streamlit
+st_pages
 polars
 altair
 markdown
