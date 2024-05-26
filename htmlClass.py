@@ -114,10 +114,25 @@ class html:
         '''
         return code
 
-    def tabBar(self, items: 'list'):
+    def tabBar(self, items: 'list', vTab = False):
         '''Creates a tab bar with buttons for each item in the list'''
+        # Add a v if we're making a vertical tab (multipage app)
+        if vTab:
+            v = 'v'
+
+            # Keep track of whether or not to disable the sidebar
+            if self.sidebar:
+                disable = False
+            else:
+                self.sidebar = True
+                disable = True
+        
+        # If we're not making a vertical tab, then v is blank
+        else:
+            v = ''
+
         # Open the div element
-        self.body[self.page] += '<div class = "tab">\n'
+        self.body[self.page] += f'<div class = "{v}tab">\n'
 
         # Increment the tab group
         self.tabGroup += 1
@@ -131,6 +146,11 @@ class html:
 
         # Close the element
         self.body[self.page] += '</div>'
+
+        # If we need to, disable the sidebar
+        if disable:
+            self.sidebar = False
+
 
     def altairHeader(self):
         '''Optional code to add to the header if we're using altair charts'''
