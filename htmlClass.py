@@ -132,12 +132,11 @@ class html:
         // Open the sidebars
         for (k = 0; k < sidebarContent.length; k ++) {
             sidebarContent[k].style.width = "250px";
-            sidebarContent[k].style.marginLeft = "250px";
         }
 
         // Adjust the margin for all the content pages
         for (k = 0; k < contentPages.length; k ++) {
-            contentPages[k].style.marginLeft = "500px";    
+            contentPages[k].style.marginLeft = "250px";    
             }
         }
 
@@ -155,7 +154,7 @@ class html:
 
         // Move all the content windows over
         for (k = 0; k < contentPages.length; k ++) {
-            contentPages[k].style.marginLeft = "250px";    
+            contentPages[k].style.marginLeft = "0";    
             }
         } 
 
