@@ -229,16 +229,20 @@ class html:
             if item not in self.pageOrder:
                 self.pageOrder.append(item)
         
-        # TODO: Remove pages that don't have content
-        for page in self.pageOrder:
-            pass
+        # Remove pages that don't have content
+        for item in self.body:
+            # Get the name of the page if we have multiple pages
+            name = self.getPageName(item)
 
+            # Check the page contents aren't blank
+            # If they are, remove the page from the list
+            if self.body[item] == '':
+                self.pageOrder.remove(name)
 
         # If we only have one page left, return an empty string
         if len(self.pageOrder) <= 1:
             code = ''
             return code
-
 
         # Add a tab for each page
         for item in self.pageOrder:
