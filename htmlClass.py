@@ -203,12 +203,13 @@ class html:
         # Close the element
         self.html('</div>\n')
 
-    def pageTabs(self, order: 'list' = None):
+    def pageTabs(self):
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
         NOTE: This code is similar but functionally different to the tabBar function'''
         # Initialize
         code = ''
+        order = self.order
 
         # Increment the tab group
         self.tabGroup += 1
@@ -227,6 +228,17 @@ class html:
         for item in self.pageNames:
             if item not in self.pageOrder:
                 self.pageOrder.append(item)
+        
+        # TODO: Remove pages that don't have content
+        for page in self.pageOrder:
+            pass
+
+
+        # If we only have one page left, return an empty string
+        if len(self.pageOrder) <= 1:
+            code = ''
+            return code
+
 
         # Add a tab for each page
         for item in self.pageOrder:
@@ -340,7 +352,7 @@ class html:
         # Return the page name
         return n
 
-    def generateReport(self, order = None):
+    def generateReport(self):
         # Create the main body block
         self.main = '''<body onload = "openNav()">
         <div id = "pageNav" class = "sidenav">
@@ -349,7 +361,7 @@ class html:
 
         # If we have multiple pages, add their buttons to the sidebar
         if len(self.pageNames) > 1:
-            self.main += self.pageTabs(order)
+            self.main += self.pageTabs()
 
         # NOTE: Sidebar now is grouped with sidenav by default
         for item in self.sidebar:

@@ -11,6 +11,9 @@ import altair as alt
 import report
 r = report.Report()
 
+# Helper file
+import helperFile as hf
+
 def main():
     # Read in a data file
     df = pl.read_csv('examples/data.csv', infer_schema_length = None)
@@ -121,4 +124,5 @@ directly from users through a web platform.'''
     r.download()
 
 if __name__ == '__main__':
+    hf.init()
     main()
