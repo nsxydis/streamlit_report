@@ -11,6 +11,9 @@ import random
 import report
 r = report.Report()
 
+# Helper File
+import helperFile as hf
+
 def main():
     # Ask for a number of points to plot
     points = r.slider('Number of points to plot on the curve', min_value = 100, max_value = 2000)
@@ -44,4 +47,5 @@ def main():
     r.download()
 
 if __name__ == '__main__':
+    hf.init()
     main()
