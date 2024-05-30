@@ -141,8 +141,9 @@ class Report:
         # Get the current tab count
         n = self.html.tabCount + 1
         
-        # Create the html tab buttons
-        self.html.tabBar(items)
+        # Create the html tab buttons, if we're creating a report
+        if self.report.ss['htmlReport'] and self.report.ignore == False:
+            self.html.tabBar(items)
 
         # streamlit
         # Create the tabs
