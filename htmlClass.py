@@ -338,7 +338,7 @@ class html:
         # Write the code
         self.html(code)
 
-    def pName(self, number):
+    def getPageName(self, number):
         '''For the given page number, returns the page name'''
         # Default value is None
         n = None
@@ -366,7 +366,7 @@ class html:
         # NOTE: Sidebar now is grouped with sidenav by default
         for item in self.sidebar:
             # Get the name of the page if we have multiple pages
-            name = self.pName(item)
+            name = self.getPageName(item)
             barID = f'id = "{name}_{item}_sidebar"' if name else ''
 
             display = ''
@@ -389,7 +389,7 @@ class html:
 
         for item in self.body:
             # Get the name of the page if we have multiple pages
-            name = self.pName(item)
+            name = self.getPageName(item)
             id = f'id = "{name}_{item}"' if name else ''
 
             display = 'style = "margin-left: 0;'
