@@ -27,7 +27,7 @@ from st_pages import get_pages, get_script_run_ctx
 
 
 class Report:
-    def __init__(self, duplicatePages: 'bool' = False):
+    def __init__(self, duplicatePages: 'bool' = False, pageOrder: 'list' = None):
         '''
         duplicatePages: Allow for the program to create multiple pages for 
                         files that have the same name.
@@ -50,6 +50,9 @@ class Report:
 
         # Clear the page data if we're regenerating the code
         self.html.increment(self.duplicatePages)
+
+        # Set the default page order of the report
+        self.html.order = pageOrder
 
         # Option to ignore fields from the report
         self.ignore = False
@@ -141,8 +144,9 @@ class Report:
         # Get the current tab count
         n = self.html.tabCount + 1
         
-        # Create the html tab buttons
-        self.html.tabBar(items)
+        # Create the html tab buttons, if we're creating a report
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.tabBar(items)
 
         # streamlit
         # Create the tabs
@@ -185,12 +189,9 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.altairChart(chart)
 
-    def download(self, reportName = 'output'):
+    def download(self, reportName: 'str' = 'output'):
         '''Runs the application and downloads the html'''
-        # If we have a page order, pass it to the html class
-        if self.order:
-            self.html.pageOrder = self.order
-
+        # If the flag is on, create the report
         if self.ss['htmlReport'] == True:
             # Make the report...
             self.html.generateReport()
