@@ -203,12 +203,13 @@ class html:
         # Close the element
         self.html('</div>\n')
 
-    def pageTabs(self, order: 'list' = None):
+    def pageTabs(self):
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
         NOTE: This code is similar but functionally different to the tabBar function'''
         # Initialize
         code = ''
+        order = self.order
 
         # Increment the tab group
         self.tabGroup += 1
@@ -227,6 +228,21 @@ class html:
         for item in self.pageNames:
             if item not in self.pageOrder:
                 self.pageOrder.append(item)
+        
+        # Remove pages that don't have content
+        for item in self.body:
+            # Get the name of the page if we have multiple pages
+            name = self.getPageName(item)
+
+            # Check the page contents aren't blank
+            # If they are, remove the page from the list
+            if self.body[item] == '':
+                self.pageOrder.remove(name)
+
+        # If we only have one page left, return an empty string
+        if len(self.pageOrder) <= 1:
+            code = ''
+            return code
 
         # Add a tab for each page
         for item in self.pageOrder:
@@ -326,7 +342,7 @@ class html:
         # Write the code
         self.html(code)
 
-    def pName(self, number):
+    def getPageName(self, number):
         '''For the given page number, returns the page name'''
         # Default value is None
         n = None
@@ -340,7 +356,7 @@ class html:
         # Return the page name
         return n
 
-    def generateReport(self, order = None):
+    def generateReport(self):
         # Create the main body block
         self.main = '''<body onload = "openNav()">
         <div id = "pageNav" class = "sidenav">
@@ -349,12 +365,12 @@ class html:
 
         # If we have multiple pages, add their buttons to the sidebar
         if len(self.pageNames) > 1:
-            self.main += self.pageTabs(order)
+            self.main += self.pageTabs()
 
         # NOTE: Sidebar now is grouped with sidenav by default
         for item in self.sidebar:
             # Get the name of the page if we have multiple pages
-            name = self.pName(item)
+            name = self.getPageName(item)
             barID = f'id = "{name}_{item}_sidebar"' if name else ''
 
             display = ''
@@ -377,7 +393,7 @@ class html:
 
         for item in self.body:
             # Get the name of the page if we have multiple pages
-            name = self.pName(item)
+            name = self.getPageName(item)
             id = f'id = "{name}_{item}"' if name else ''
 
             display = 'style = "margin-left: 0;'
