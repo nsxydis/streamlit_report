@@ -93,6 +93,22 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(text)
 
+    def markdown(self, text: 'str', unsafe_allow_html: 'bool' = False, **kwargs):
+        '''Mimics st.markdown'''
+        # streamlit
+        st.markdown(text, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            
+            # If we're allowing unsafe html, write to the report directly
+            if unsafe_allow_html:
+                self.html.html(text)
+            
+            # Otherwise, write to the report
+            else:
+                self.html.write(text)
+
     def dataframe(self, df, height = '400px', width = '60%', **kwargs):
         '''Mimics st.dataframe'''
         # streamlit
