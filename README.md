@@ -27,10 +27,12 @@ The below features are simplified representations of what the dashboard presents
 # Current and Planned Features
 - [x] _streamlit.write_ support for markdown and basic text
 - [ ] _streamlit.write_ support for list, dictionary types
+- [x] _streamlit.markdown_ support -- **allow_unsafe_html = True** will write custom html code to the report
 - [x] _streamlit.tabs_ support using **with** generator functions
 - [x] _streamlit.sidebar_ support using **with** generator functions
 - [x] collapsable sidebar
-- [ ] reveal the collapsed sidebar
+- [ ] button reveal the collapsed sidebar
+- [ ] resizable sidebar
 - [ ] _streamlit.cols_ support using **with** generator functions
 - [x] _streamlit.altair_chart_ support
 - [x] _streamlit_report.Report.ignore_ flag to temporarily suppress writing to the report file
