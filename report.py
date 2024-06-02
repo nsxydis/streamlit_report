@@ -180,10 +180,10 @@ class Report:
         for t in tabsList:
             yield t.combo
 
-    def altair_chart(self, chart):
+    def altair_chart(self, chart, **kwargs):
         '''Mimics the altair_chart function of streamlit'''
         # Streamlit
-        st.altair_chart(chart)
+        st.altair_chart(chart, **kwargs)
 
         # HTML
         if self.ss['htmlReport'] and self.ignore == False:
