@@ -1,3 +1,10 @@
+# Version 0.0.2
+- added functions removed from st_pages to restore page name detection
+- moved demo program and data to the examples folder
+
+# Version 0.0.1
+Added basic functionality including multipage support, altair graphs, and some input data fields.
+
 # How to use
 1. Clone the repository to your device.
 2. Copy the style.html file and place it in the same folder as your dashboard file.

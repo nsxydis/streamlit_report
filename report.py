@@ -21,9 +21,8 @@ Author: Nick Xydis
 import streamlit as st
 import htmlClass
 from contextlib import contextmanager
-
-# Code to get the page name
-from st_pages import get_pages, get_script_run_ctx 
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+from streamlit.source_util import get_pages
 
 
 class Report:
@@ -70,8 +69,9 @@ class Report:
 
     def pageName(self):
         '''Gets and returns the filename of the running page'''
-        # Code from blackary in discussion link below...
+        # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
+        # NOTE: These modules were removed from st-pages (st_pages)
         pages = get_pages("")
         ctx = get_script_run_ctx()
 
