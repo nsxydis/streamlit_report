@@ -7,6 +7,10 @@ import streamlit as st
 import polars as pl
 import altair as alt
 
+# Add to path
+import os, sys
+sys.path.insert(0, os.path.dirname(os.getcwd()))
+
 # Custom Reporting Module
 import report
 r = report.Report()
@@ -16,7 +20,7 @@ import helperFile as hf
 
 def main():
     # Read in a data file
-    df = pl.read_csv('examples/data.csv', infer_schema_length = None)
+    df = pl.read_csv('data.csv', infer_schema_length = None)
     
     # View raw data
     r.ignore = True
