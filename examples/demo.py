@@ -8,8 +8,8 @@ import polars as pl
 import altair as alt
 
 # Add to path
-import os, sys
-sys.path.insert(0, os.path.dirname(os.getcwd()))
+# import os, sys
+# sys.path.insert(0, os.path.dirname(os.getcwd()))
 
 # Custom Reporting Module
 import report
