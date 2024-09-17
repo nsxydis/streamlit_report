@@ -1,3 +1,17 @@
+**TODO**
++ [ ] Create distribution file
++ [ ] st.columns
++ [ ] st.date_input
++ [ ] st.form
++ [ ] st.image
++ [ ] st.logo
++ [ ] st.multiselect
++ [ ] st.navigation
++ [ ] st.page_link
++ [ ] st.text
++ [ ] st.text_input
++ [ ] st.text_area
+
 # Version 0.0.2
 - added functions removed from st_pages to restore page name detection
 - moved demo program and data to the examples folder
