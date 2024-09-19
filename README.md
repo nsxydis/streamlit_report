@@ -5,7 +5,7 @@
 3. In your program, add the cloned repository location to your path and call the Report class:
 ```python
 import sys
-sys.path.insert(<cloned repo location>)
+sys.path.insert(0, <cloned repo location>)
 import report
 r = report.Report()
 ```
