@@ -26,7 +26,8 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
-## Version XXX
+## Version 0.0.3
+- Restructured repository layout 
 - Reformatted the README.md file
 - Removed demo and related programs from the main branch
     * They still exist on the demo branch and are primarily used for the streamlit cloud demo page
