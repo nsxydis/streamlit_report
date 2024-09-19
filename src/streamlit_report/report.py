@@ -19,17 +19,21 @@ Author: Nick Xydis
 '''
 
 import streamlit as st
-import htmlClass
+from streamlit_report import htmlClass
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
 
 
 class Report:
-    def __init__(self, duplicatePages: 'bool' = False, pageOrder: 'list' = None):
+    def __init__(self, duplicatePages: 'bool' = False, pageOrder: 'list' = None,
+                 styleFile = None):
         '''
         duplicatePages: Allow for the program to create multiple pages for 
                         files that have the same name.
+        pageOrder:      Order that the pages should appear in, using the names of the page.
+        styleFile:      Name of the .html file that specifies the styles to use. If none is 
+                        defined, uses the default styles. 
         '''
         # Session_state shorthand
         self.session_state = st.session_state

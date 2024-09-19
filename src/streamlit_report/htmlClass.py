@@ -18,9 +18,13 @@ Purpose: HTML class for use in generating reports.
 
 import markdown
 import polars as pl
+import os
 
 class html:
-    def __init__(self):
+    def __init__(self, styleFile = 'style.html'):
+        # Specify a style file to use
+        self.styleFile = styleFile
+
         # Note this code is static for all pages
         self.head = self.header()
         self.script = self.tabCode()
@@ -92,9 +96,23 @@ class html:
         
         # Read in the style html and add to our head code
         text = ''
-        with open('style.html') as f:
-            for line in f.readlines():
-                text += line
+
+        # Try to read from the dashboard directory first
+        try:
+            with open(self.styleFile) as f:
+                for line in f.readlines():
+                    text += line
+        
+        # Otherwise read from the default file
+        except:
+            text = ''
+            # Get the directory of this module
+            dirpath = os.path.dirname(__file__)
+            with open(os.path.join(dirpath, self.styleFile)) as f:
+                for line in f.readlines():
+                    text += line
+
+        # Write the style
         head += text
 
         return head

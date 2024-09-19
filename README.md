@@ -1,10 +1,3 @@
-# Version 0.0.2
-- added functions removed from st_pages to restore page name detection
-- moved demo program and data to the examples folder
-
-# Version 0.0.1
-Added basic functionality including multipage support, altair graphs, and some input data fields.
-
 # How to use
 1. Clone the repository to your device.
 2. Copy the style.html file and place it in the same folder as your dashboard file.
@@ -31,27 +24,61 @@ Styles can be modified by changing the styles.html file. Current styles were bas
 # Note
 The below features are simplified representations of what the dashboard presents. Streamlit has features that are not and may never be implemented by this library. The purpose is to streamline a simple and static reporting mechanism without having to write additional code. 
 
-# Current and Planned Features
-- [x] _streamlit.write_ support for markdown and basic text
-- [ ] _streamlit.write_ support for list, dictionary types
-- [x] _streamlit.markdown_ support -- **allow_unsafe_html = True** will write custom html code to the report
-- [x] _streamlit.tabs_ support using **with** generator functions
-- [x] _streamlit.sidebar_ support using **with** generator functions
-- [x] collapsable sidebar
-- [ ] button reveal the collapsed sidebar
-- [ ] resizable sidebar
-- [ ] _streamlit.cols_ support using **with** generator functions
-- [x] _streamlit.altair_chart_ support
-- [x] _streamlit_report.Report.ignore_ flag to temporarily suppress writing to the report file
-- [x] _streamlit.dataframe_ support, displaying a polars or pandas dataframe in a sized window
-- [x] _streamlit.selectbox_ support, displaying the name of the item selected during report generation
-- [ ] _streamlit.multiselectbox_ support, displaying the name of the items selected during report generation
-- [x] _streamlit.slider_ support for single value slider selections
-- [ ] _streamlit.slider_ support for multipoint values selections
-- [x] report generation and download button for single page reports
-- [x] multi-page app support
-- [x] creation of single report for multi-page applications
-- [ ] improved style defaults
-- [x] option to specify the default page order that a report generates in
-- [ ] option to only replace page content when a button is pressed
-- [ ] option to write to temporary files instead of storing the html code in memory
+# Version History
+
+## Version 0.0.3
+- Restructured repository layout 
+- Reformatted the README.md file
+- Removed demo and related programs from the main branch
+    * They still exist on the demo branch and are primarily used for the streamlit cloud demo page
+
+## Version 0.0.2
+- added functions removed from st_pages to restore page name detection
+- moved demo program and data to the examples folder
+
+## Version 0.0.1
+Added basic functionality including multipage support, altair graphs, and some input data fields.
+- _streamlit.write_ support for markdown and basic text
+- _streamlit.markdown_ support -- **allow_unsafe_html = True** will write custom html code to the report
+- _streamlit.tabs_ support using **with** generator functions
+- _streamlit.sidebar_ support using **with** generator functions
+- collapsable sidebar
+- _streamlit.altair_chart_ support
+- _streamlit_report.Report.ignore_ flag to temporarily suppress writing to the report file
+- _streamlit.dataframe_ support, displaying a polars or pandas dataframe in a sized window
+- _streamlit.selectbox_ support, displaying the name of the item selected during report generation
+- _streamlit.slider_ support for single value slider selections
+- report generation and download button for single page reports
+- multi-page app support
+- creation of single report for multi-page applications
+- option to specify the default page order that a report generates in
+
+# Planned Features
+## Priority items
++ [ ] Create distribution file
++ [ ] st.date_input
++ [ ] st.multiselect
++ [ ] st.text_input
++ [ ] st.text_area
+
+## Lower priority items
++ [ ] st.columns
++ [ ] st.text
++ [ ] button to reveal the collapsed sidebar
++ [ ] _streamlit.slider_ support for multipoint values selections 
++ [ ] improved style defaults
++ [ ] option to write to temporary files instead of storing the html code in memory
+
+## Needs review
++ [ ] st.form
++ [ ] st.image
++ [ ] st.logo
++ [ ] st.page_link
++ [ ] st.navigation
++ [ ] resizable sidebar
++ [ ] _streamlit.write_ support for list, dictionary types
++ [ ] option to only replace page content when a button is pressed
++ [ ] pdf report option
+
+## Unsupported Features
+<Pending>
