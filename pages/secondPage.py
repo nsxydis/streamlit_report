@@ -8,7 +8,7 @@ import altair as alt
 import random
 
 # Custom Reporting Module
-import report
+from streamlit_report import report
 r = report.Report()
 
 # Helper File
