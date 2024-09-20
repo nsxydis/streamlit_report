@@ -24,6 +24,7 @@ setup(
     name                = 'streamlit_report',
     version             = '0.0.3',
     description         = 'Package used to create reports from streamlit dashboards',
+    long_description    = open('README.md').read(),
     author              = 'Nick Xydis',
     license             = 'Apache License, Version 2.0',
     url                 = 'https://github.com/nsxydis/streamlit_report',
