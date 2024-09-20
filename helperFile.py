@@ -9,7 +9,7 @@ print(updir)
 sys.path.insert(0, updir)
 
 import streamlit as st
-import report
+from streamlit_report import report
 
 def init():
     '''Run for each page'''
