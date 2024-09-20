@@ -81,4 +81,4 @@ Added basic functionality including multipage support, altair graphs, and some i
 + [ ] pdf report option
 
 ## Unsupported Features
-<Pending>
+- Pending
