@@ -136,7 +136,7 @@ class Report:
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(f"{self.heading} {label}{self.reportLabel}:")
-            if len(selection) > 0:
+            if selection:
                 self.html.write(f"{selection}")
             else:
                 self.html.write("Nothing selected")
