@@ -136,14 +136,27 @@ class Report:
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(f"{self.heading} {label}{self.reportLabel}:")
-            self.html.write(f"{selection}")
+            if len(selection) > 0:
+                self.html.write(f"{selection}")
+            else:
+                self.html.write("Nothing selected")
 
         # Return the selection
         return selection
     
-    def multiselect(self, lable, options, **kwargs):
+    def multiselect(self, label, options, **kwargs):
         '''Mimics st.multiselect'''
-        values = st.mult
+        # streamlit 
+        values = st.multiselect(label, options = options, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f"{self.heading} {label}{self.reportLabel}:")
+            if len(values) > 0:
+                # Write each selection as a comma separated list
+                self.html.write(f"{', '.join(str(item) for item in values)}")
+            else:
+                self.html.write("Nothing selected")
 
     def slider(self, label, **kwargs):
         '''Mimics st.slider'''
@@ -182,6 +195,8 @@ class Report:
 
         # Return the st output
         return value  
+
+    
 
     @property
     @contextmanager 
