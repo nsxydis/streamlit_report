@@ -19,7 +19,10 @@ Author: Nick Xydis
 '''
 
 import streamlit as st
-from streamlit_report import htmlClass
+try:
+    from streamlit_report import htmlClass
+except:
+    import htmlClass
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
@@ -65,6 +68,9 @@ class Report:
 
         # Define the lable to display after a selection field
         self.reportLabel = ' selection'
+
+        # Optional Function to convert dates
+        self.dateFormatFunc = None
 
     def init(self, variable, value):
         '''Initializes the session state with the given information'''
@@ -147,6 +153,28 @@ class Report:
 
         # Return the slider output
         return value
+    
+    def date_input(self, label, **kwargs):
+        '''Mimics st.date_input
+        dateFormatFunc: Optional function to convert the date into
+                        a different format'''
+        # streamlit
+        value = st.date_input(label, **kwargs)
+
+        # If we're making a report... convert the date
+        if self.ss['htmlReport'] and self.ignore == False:
+            
+            # Process using the given function if provided 
+            if self.dateFormatFunc:
+                value = self.dateFormatFunc(value)
+
+            # Otherwise convert to a string
+            else:
+                value = str(value)
+
+            # Add to the report
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+            self.html.write(f"{value}")    
 
     @property
     @contextmanager 
