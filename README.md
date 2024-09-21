@@ -55,7 +55,7 @@ Added basic functionality including multipage support, altair graphs, and some i
 # Planned Features
 ## Priority items
 + [x] Create distribution file
-+ [ ] st.date_input
++ [x] st.date_input
 + [ ] st.multiselect
 + [ ] st.text_input
 + [ ] st.text_area
