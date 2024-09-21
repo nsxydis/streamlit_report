@@ -141,6 +141,10 @@ class Report:
         # Return the selection
         return selection
     
+    def multiselect(self, lable, options, **kwargs):
+        '''Mimics st.multiselect'''
+        values = st.mult
+
     def slider(self, label, **kwargs):
         '''Mimics st.slider'''
         # streamlit
@@ -166,15 +170,18 @@ class Report:
             
             # Process using the given function if provided 
             if self.dateFormatFunc:
-                value = self.dateFormatFunc(value)
+                newValue = self.dateFormatFunc(value)
 
             # Otherwise convert to a string
             else:
-                value = str(value)
+                newValue = str(value)
 
             # Add to the report
             self.html.write(f"{self.heading} {label}{self.reportLabel}")
-            self.html.write(f"{value}")    
+            self.html.write(f"{newValue}")  
+
+        # Return the st output
+        return value  
 
     @property
     @contextmanager 
