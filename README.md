@@ -57,12 +57,12 @@ Added basic functionality including multipage support, altair graphs, and some i
 + [x] Create distribution file
 + [x] st.date_input
 + [x] st.multiselect
-+ [ ] st.text_input
-+ [ ] st.text_area
++ [x] st.text_input
++ [x] st.text_area
 
 ## Lower priority items
 + [ ] st.columns
-+ [ ] st.text
++ [x] st.text
 + [ ] button to reveal the collapsed sidebar
 + [ ] _streamlit.slider_ support for multipoint values selections 
 + [ ] improved style defaults
