@@ -158,6 +158,27 @@ class Report:
             else:
                 self.html.write("Nothing selected")
 
+    def text_area(self, label, **kwargs):
+        '''Mimics st.text_area'''
+        # streamlit
+        value = st.text_area(label, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            self.html.write(f'{value}')
+
+    def text_input(self, label, **kwargs):
+        '''Mimics st.text_area'''
+        # streamlit
+        value = st.text_input(label, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            self.html.write(f'{value}')
+
+
     def slider(self, label, **kwargs):
         '''Mimics st.slider'''
         # streamlit
