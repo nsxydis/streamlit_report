@@ -66,8 +66,11 @@ class Report:
         # Define the markdown heading level
         self.heading = "###"
 
-        # Define the lable to display after a selection field
-        self.reportLabel = ' selection'
+        # Define the text to display after a selection field
+        self.reportLabel = ' selection:'
+
+        # Define the text to display after a text field
+        self.textLabel = ' input:'
 
         # Optional Function to convert dates
         self.dateFormatFunc = None
