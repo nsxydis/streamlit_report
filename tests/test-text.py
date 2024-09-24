@@ -3,7 +3,7 @@ Purpose: test st.date_input
 '''
 
 import streamlit as st
-import report
+from streamlit_report import report
 import polars as pl
 r = report.Report()
 
