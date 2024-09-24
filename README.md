@@ -25,6 +25,12 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
+## Version 0.0.4-alpha
+- added st.date_input support
+- added st.multiselect support
+- added st.text, st.text_area, st.text_input support
+- added st.slider support for range value selections
+
 ## Version 0.0.3
 - Restructured repository layout 
 - Reformatted the README.md file
@@ -55,16 +61,16 @@ Added basic functionality including multipage support, altair graphs, and some i
 # Planned Features
 ## Priority items
 + [x] Create distribution file
-+ [ ] st.date_input
-+ [ ] st.multiselect
-+ [ ] st.text_input
-+ [ ] st.text_area
++ [x] st.date_input
++ [x] st.multiselect
++ [x] st.text_input
++ [x] st.text_area
 
 ## Lower priority items
 + [ ] st.columns
-+ [ ] st.text
++ [x] st.text
 + [ ] button to reveal the collapsed sidebar
-+ [ ] _streamlit.slider_ support for multipoint values selections 
++ [x] _streamlit.slider_ support for multipoint values selections 
 + [ ] improved style defaults
 + [ ] option to write to temporary files instead of storing the html code in memory
 

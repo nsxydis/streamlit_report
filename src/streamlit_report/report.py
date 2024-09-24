@@ -19,7 +19,10 @@ Author: Nick Xydis
 '''
 
 import streamlit as st
-from streamlit_report import htmlClass
+try:
+    from streamlit_report import htmlClass
+except:
+    import htmlClass
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 from streamlit.source_util import get_pages
@@ -63,8 +66,14 @@ class Report:
         # Define the markdown heading level
         self.heading = "###"
 
-        # Define the lable to display after a selection field
-        self.reportLabel = ' selection'
+        # Define the text to display after a selection field
+        self.reportLabel = ' selection:'
+
+        # Define the text to display after a text field
+        self.textLabel = ' input:'
+
+        # Optional Function to convert dates
+        self.dateFormatFunc = None
 
     def init(self, variable, value):
         '''Initializes the session state with the given information'''
@@ -129,24 +138,114 @@ class Report:
         
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}:")
-            self.html.write(f"{selection}")
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+            if selection:
+                self.html.write(f"{selection}")
+            else:
+                self.html.write("Nothing selected")
 
         # Return the selection
         return selection
     
-    def slider(self, label, **kwargs):
-        '''Mimics st.slider'''
-        # streamlit
-        value = st.slider(label, **kwargs)
+    def multiselect(self, label, options, **kwargs):
+        '''Mimics st.multiselect'''
+        # streamlit 
+        values = st.multiselect(label, options = options, **kwargs)
 
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(f"{self.heading} {label}{self.reportLabel}")
-            self.html.write(f"{value}")
+            if len(values) > 0:
+                # Write each selection as a comma separated list
+                self.html.write(f"{', '.join(str(item) for item in values)}")
+            else:
+                self.html.write("Nothing selected")
+
+    def text(self, body, **kwargs):
+        '''Mimics st.text'''
+        # streamlit
+        st.text(body, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f'{body}')
+    
+    def text_area(self, label, **kwargs):
+        '''Mimics st.text_area'''
+        # streamlit
+        value = st.text_area(label, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            if value:
+                self.html.write(f'{value}')
+            else:
+                self.html.write('No input')
+
+        return value
+
+    def text_input(self, label, **kwargs):
+        '''Mimics st.text_input'''
+        # streamlit
+        value = st.text_input(label, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            if value:
+                self.html.write(f'{value}')
+            else:
+                self.html.write('No input')
+
+        return value
+
+    def slider(self, label, **kwargs):
+        '''Mimics st.slider'''
+        # streamlit
+        result = st.slider(label, **kwargs)
+
+        # If we're making a report, add to it
+        if self.ss['htmlReport'] and self.ignore == False:
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+            
+            # Check if we have a range of results
+            if 'value' in kwargs and type(kwargs['value']) == tuple:
+                self.html.write(f"{result[0]} to {result[1]}")
+
+            # Otherwise, display the single result
+            else:
+                self.html.write(f"{result}")
 
         # Return the slider output
-        return value
+        return result
+    
+    def date_input(self, label, **kwargs):
+        '''Mimics st.date_input
+        dateFormatFunc: Optional function to convert the date into
+                        a different format'''
+        # streamlit
+        value = st.date_input(label, **kwargs)
+
+        # If we're making a report... convert the date
+        if self.ss['htmlReport'] and self.ignore == False:
+            
+            # Process using the given function if provided 
+            if self.dateFormatFunc:
+                newValue = self.dateFormatFunc(value)
+
+            # Otherwise convert to a string
+            else:
+                newValue = str(value)
+
+            # Add to the report
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+            self.html.write(f"{newValue}")  
+
+        # Return the st output
+        return value  
+
+    
 
     @property
     @contextmanager 
