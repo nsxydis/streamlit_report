@@ -29,8 +29,12 @@ from streamlit.source_util import get_pages
 
 
 class Report:
-    def __init__(self, duplicatePages: 'bool' = False, pageOrder: 'list' = None,
-                 styleFile = None):
+    def __init__(
+            self, 
+            duplicatePages: 'bool' = False, 
+            pageOrder: 'list' = None,
+            styleFile = None
+        ):
         '''
         duplicatePages: Allow for the program to create multiple pages for 
                         files that have the same name.
@@ -43,16 +47,32 @@ class Report:
         self.ss = self.session_state
         
         # Inititialization
+        self.styleFile = styleFile
         self.init('htmlReport', False)
-        self.init('html', htmlClass.html())
+        self.init('html', htmlClass.html(self.styleFile))
         self.duplicatePages = duplicatePages
-        self.order = None
 
+        # Redefine page numbers
+        self.init('streamlit_report-htmlRedefinePages', {})
+        self.redefine = self.ss['streamlit_report-htmlRedefinePages']
+        self.scriptHash = None
+        self.nav = False
+        
         # If we already have an html report going, preserve it
         self.html = self.ss.html
 
         # Get and store the name of the current page
-        self.html.pageName = self.pageName()
+        try:
+            self.html.pageName = self.pageName()
+        except:
+            # If we're using the navigation options we'll have to keep track of script hashes
+            self.scriptHash = get_script_run_ctx().page_script_hash
+
+            # Check if we've already redefined the hash
+            if self.scriptHash in self.redefine:
+                self.html.pageName = self.redefine[self.scriptHash]
+            else:
+                self.html.pageName = self.scriptHash
 
         # Clear the page data if we're regenerating the code
         self.html.increment(self.duplicatePages)
@@ -74,6 +94,7 @@ class Report:
 
         # Optional Function to convert dates
         self.dateFormatFunc = None
+
 
     def init(self, variable, value):
         '''Initializes the session state with the given information'''
@@ -245,7 +266,31 @@ class Report:
         # Return the st output
         return value  
 
-    
+    def navigation(self, pages, **kwargs):
+        '''Mimics st.navigation'''
+        # streamlit
+        nav = st.navigation(pages, **kwargs)
+
+        # Shorthand
+        redefine = self.ss['streamlit_report-htmlRedefinePages']
+        self.nav = True
+        
+        # Check if we're already redefined this item
+        if nav.title not in redefine and self.scriptHash:
+            redefine[self.scriptHash] = nav.title
+
+            # For all items to redefine, change the pageNames
+            replace = None
+            for pageName, pageNumber in self.html.pageNames.items():
+                if pageName == self.scriptHash:
+                    replace = pageName
+                    break
+
+            # Replace the item
+            if replace:
+                self.html.pageNames[redefine[replace]] = self.html.pageNames.pop(replace)
+
+        return nav
 
     @property
     @contextmanager 
@@ -328,7 +373,7 @@ class Report:
         # If we're not generating a report, clear the saved html code
         if self.ss['htmlReport'] == True:
             self.ss['htmlReport'] = False
-            self.ss.html = htmlClass.html()
+            self.ss.html = htmlClass.html(styleFile = self.styleFile)
         else:
             self.ss['htmlReport'] = True
 
