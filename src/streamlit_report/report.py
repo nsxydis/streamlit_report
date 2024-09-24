@@ -138,7 +138,7 @@ class Report:
         
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}:")
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
             if selection:
                 self.html.write(f"{selection}")
             else:
@@ -154,7 +154,7 @@ class Report:
 
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}:")
+            self.html.write(f"{self.heading} {label}{self.reportLabel}")
             if len(values) > 0:
                 # Write each selection as a comma separated list
                 self.html.write(f"{', '.join(str(item) for item in values)}")
