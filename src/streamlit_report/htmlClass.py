@@ -21,9 +21,9 @@ import polars as pl
 import os
 
 class html:
-    def __init__(self, styleFile = 'style.html'):
+    def __init__(self, styleFile = None):
         # Specify a style file to use
-        self.styleFile = styleFile
+        self.styleFile = styleFile if styleFile else 'style.html'
 
         # Note this code is static for all pages
         self.head = self.header()
@@ -77,6 +77,9 @@ class html:
         elif allowDuplicates == False:
             # Navigate to this page
             self.page = self.pageNames[self.pageName]
+
+        # Make sure the page is an int
+        self.page = int(self.page)
         
         # Clear and/or initialize the page
         self.clear()
@@ -258,7 +261,7 @@ class html:
 
             # Check the page contents aren't blank
             # If they are, remove the page from the list
-            if self.body[item] == '':
+            if self.body[item] == '' and name in self.pageOrder:
                 self.pageOrder.remove(name)
 
         # If we only have one page left, return an empty string
@@ -370,10 +373,9 @@ class html:
         n = None
         
         # Loop through all the pages we collected data for
-        for name in self.pageNames:
-            if number == self.pageNames[name]:
-                n = name
-                break
+        for key, value in self.pageNames.items():
+            if value == number:
+                n = key
 
         # Return the page name
         return n
