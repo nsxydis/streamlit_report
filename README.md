@@ -25,6 +25,11 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
+## Version 0.0.4-alpha
+- added st.date_input support
+- added st.multiselect support
+- added st.text, st.text_area, st.text_input support
+
 ## Version 0.0.3
 - Restructured repository layout 
 - Reformatted the README.md file

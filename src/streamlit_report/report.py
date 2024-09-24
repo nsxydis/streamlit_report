@@ -183,6 +183,8 @@ class Report:
             else:
                 self.html.write('No input')
 
+        return value
+
     def text_input(self, label, **kwargs):
         '''Mimics st.text_input'''
         # streamlit
@@ -196,19 +198,27 @@ class Report:
             else:
                 self.html.write('No input')
 
+        return value
 
     def slider(self, label, **kwargs):
         '''Mimics st.slider'''
         # streamlit
-        value = st.slider(label, **kwargs)
+        result = st.slider(label, **kwargs)
 
         # If we're making a report, add to it
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(f"{self.heading} {label}{self.reportLabel}")
-            self.html.write(f"{value}")
+            
+            # Check if we have a range of results
+            if 'value' in kwargs and type(kwargs['value']) == tuple:
+                self.html.write(f"{result[0]} to {result[1]}")
+
+            # Otherwise, display the single result
+            else:
+                self.html.write(f"{result}")
 
         # Return the slider output
-        return value
+        return result
     
     def date_input(self, label, **kwargs):
         '''Mimics st.date_input
