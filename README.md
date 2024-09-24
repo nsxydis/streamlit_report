@@ -29,6 +29,7 @@ The below features are simplified representations of what the dashboard presents
 - added st.date_input support
 - added st.multiselect support
 - added st.text, st.text_area, st.text_input support
+- added st.slider support for range value selections
 
 ## Version 0.0.3
 - Restructured repository layout 
@@ -69,7 +70,7 @@ Added basic functionality including multipage support, altair graphs, and some i
 + [ ] st.columns
 + [x] st.text
 + [ ] button to reveal the collapsed sidebar
-+ [ ] _streamlit.slider_ support for multipoint values selections 
++ [x] _streamlit.slider_ support for multipoint values selections 
 + [ ] improved style defaults
 + [ ] option to write to temporary files instead of storing the html code in memory
 
