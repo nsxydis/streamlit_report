@@ -22,7 +22,7 @@ from setuptools import setup
 # Setup Function
 setup(
     name                = 'streamlit_report',
-    version             = '0.0.3',
+    version             = '0.0.4-alpha',
     description         = 'Package used to create reports from streamlit dashboards',
     long_description    = "See README.md on github url",
     author              = 'Nick Xydis',
