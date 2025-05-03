@@ -20,6 +20,7 @@ Author: Nick Xydis
 # Type hints & versioning
 from __future__ import annotations
 from packaging.version import Version
+from streamlit.navigation.page import StreamlitPage
 
 # Standard imports
 from pathlib import Path
@@ -44,9 +45,10 @@ else:
 class Report:
     def __init__(
             self, 
-            duplicatePages: 'bool' = False, 
-            pageOrder: 'list' = None,
-            styleFile = None
+            duplicatePages: bool = False, 
+            pageOrder: list = None,
+            styleFile: str = None,
+            startActive: bool = False,
         ):
         '''
         duplicatePages: Allow for the program to create multiple pages for 
@@ -54,6 +56,9 @@ class Report:
         pageOrder:      Order that the pages should appear in, using the names of the page.
         styleFile:      Name of the .html file that specifies the styles to use. If none is 
                         defined, uses the default styles. 
+        startActive:    True / False option. If True, reports will default to generating the
+                        html code. 
+                        NOTE: This only takes effect on the first module to initialize a report.
         '''
         # Session_state shorthand
         self.session_state = st.session_state
@@ -61,7 +66,7 @@ class Report:
         
         # Inititialization
         self.styleFile = styleFile
-        self.init('htmlReport', False)
+        self.init('htmlReport', startActive)
         self.init('html', htmlClass.html(self.styleFile))
         self.duplicatePages = duplicatePages
 
@@ -72,7 +77,7 @@ class Report:
         self.nav = False
         
         # If we already have an html report going, preserve it
-        self.html = self.ss.html
+        self.html: htmlClass = self.ss.html
 
         # Get and store the name of the current page
         try:
@@ -110,12 +115,12 @@ class Report:
         self.dateFormatFunc = None
 
 
-    def init(self, variable, value):
-        '''Initializes the session state with the given information'''
+    def init(self, variable: str, value: Any) -> None:
+        '''Initializes the streamlit session state with the given information'''
         if variable not in self.ss:
             self.ss[variable] = value
 
-    def pageName(self):
+    def pageName(self) -> str:
         '''Gets and returns the filename of the running page'''
         # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
@@ -143,7 +148,7 @@ class Report:
 
         return current_page['page_name']
 
-    def write(self, text, **kwargs):
+    def write(self, text: str, **kwargs) -> None:
         '''Mimics st.write'''
         # streamlit
         st.write(text, **kwargs)
@@ -152,7 +157,7 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(text)
 
-    def markdown(self, text: 'str', unsafe_allow_html: 'bool' = False, **kwargs):
+    def markdown(self, text: 'str', unsafe_allow_html: 'bool' = False, **kwargs) -> None:
         '''Mimics st.markdown'''
         # streamlit
         st.markdown(text, **kwargs)
@@ -168,7 +173,13 @@ class Report:
             else:
                 self.html.write(text)
 
-    def dataframe(self, df, height = '400px', width = '60%', **kwargs):
+    def dataframe(
+            self, 
+            df: DataFrame,      # type: ignore 
+            height = '400px', 
+            width = '60%', 
+            **kwargs
+            ) -> None:
         '''Mimics st.dataframe'''
         # streamlit
         st.dataframe(df, **kwargs)
@@ -177,7 +188,7 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.dataframe(df, height, width)
 
-    def selectbox(self, label, options, **kwargs):
+    def selectbox(self, label: str, options: list, **kwargs) -> str:
         '''Mimics st.selectbox'''
         # streamlit
         selection = st.selectbox(label, options, **kwargs)
@@ -215,7 +226,7 @@ class Report:
         # Return the selected data
         return values
 
-    def text(self, body, **kwargs) -> None:
+    def text(self, body: str, **kwargs) -> None:
         '''Mimics st.text'''
         # streamlit
         st.text(body, **kwargs)
@@ -224,7 +235,7 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(f'{body}')
     
-    def text_area(self, label, **kwargs):
+    def text_area(self, label: str, **kwargs) -> str:
         '''Mimics st.text_area'''
         # streamlit
         value = st.text_area(label, **kwargs)
@@ -239,7 +250,7 @@ class Report:
 
         return value
 
-    def text_input(self, label, **kwargs):
+    def text_input(self, label: str, **kwargs) -> str:
         '''Mimics st.text_input'''
         # streamlit
         value = st.text_input(label, **kwargs)
@@ -254,7 +265,7 @@ class Report:
 
         return value
 
-    def slider(self, label, **kwargs):
+    def slider(self, label: str, **kwargs) -> Any:
         '''Mimics st.slider'''
         # streamlit
         result = st.slider(label, **kwargs)
@@ -299,7 +310,7 @@ class Report:
         # Return the st output
         return value  
 
-    def navigation(self, pages, **kwargs):
+    def navigation(self, pages, **kwargs) -> StreamlitPage:
         '''Mimics st.navigation'''
         # streamlit
         nav = st.navigation(pages, **kwargs)
@@ -377,7 +388,7 @@ class Report:
         for t in tabsList:
             yield t.combo
 
-    def altair_chart(self, chart, **kwargs):
+    def altair_chart(self, chart: altair.Chart, **kwargs) -> None: # type: ignore
         '''Mimics the altair_chart function of streamlit'''
         # Streamlit
         st.altair_chart(chart, **kwargs)
@@ -386,8 +397,11 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.altairChart(chart)
 
-    def download(self, reportName: 'str' = 'output'):
-        '''Runs the application and downloads the html'''
+    def download(self, reportName: 'str' = 'output') -> None:
+        '''
+        Runs the application and downloads the html
+            reportName: Name of the report when generated
+        '''
         # If the flag is on, create the report
         if self.ss['htmlReport'] == True:
             # Make the report...
@@ -401,7 +415,7 @@ class Report:
             # Otherwise ask to download
             st.button('Generate Report?', on_click = self.generateReport)
     
-    def generateReport(self):
+    def generateReport(self) -> None:
         '''Alternates the report generate value'''
         # If we're not generating a report, clear the saved html code
         if self.ss['htmlReport'] == True:

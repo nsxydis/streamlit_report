@@ -21,7 +21,7 @@ import polars as pl
 import os
 
 class html:
-    def __init__(self, styleFile = None):
+    def __init__(self, styleFile: str = None):
         # Specify a style file to use
         self.styleFile = styleFile if styleFile else 'style.html'
 
@@ -51,7 +51,7 @@ class html:
         # Init the body and sidebar sections
         self.clear()
 
-    def clear(self):
+    def clear(self) -> None:
         '''Clears page code, including if the current page has been generated before'''
         pageContent = [
             self.body,
@@ -66,7 +66,7 @@ class html:
         # Reset trigger variables
         self.altairCharts = False
 
-    def increment(self, allowDuplicates : 'bool' = False):
+    def increment(self, allowDuplicates : 'bool' = False) -> None:
         '''Increments the page or goes to the given page and clears its content'''
         # If we're allowing duplicates or have a new page...
         if allowDuplicates == True or self.pageName not in self.pageNames:
@@ -84,7 +84,7 @@ class html:
         # Clear and/or initialize the page
         self.clear()
 
-    def header(self):
+    def header(self) -> str:
         '''Default header code'''
         # Starting code
         head = '''
@@ -120,7 +120,7 @@ class html:
 
         return head
 
-    def tabCode(self):
+    def tabCode(self) -> str:
         '''Writes the tab javascript code for tab navigation'''
         code = '''
         <script>
@@ -228,7 +228,7 @@ class html:
         # Close the element
         self.html('</div>\n')
 
-    def pageTabs(self):
+    def pageTabs(self) -> str:
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
         NOTE: This code is similar but functionally different to the tabBar function'''
@@ -283,7 +283,7 @@ class html:
         # code += '</div>\n'
         return code
             
-    def altairHeader(self):
+    def altairHeader(self) -> str:
         '''Optional code to add to the header if we're using altair charts'''
         import altair as alt
 
@@ -367,7 +367,7 @@ class html:
         # Write the code
         self.html(code)
 
-    def getPageName(self, number):
+    def getPageName(self, number: int) -> str:
         '''For the given page number, returns the page name'''
         # Default value is None
         n = None
@@ -380,7 +380,7 @@ class html:
         # Return the page name
         return n
 
-    def generateReport(self):
+    def generateReport(self) -> str:
         # Create the main body block
         self.main = '''<body onload = "openNav()">
         <div id = "pageNav" class = "sidenav">
