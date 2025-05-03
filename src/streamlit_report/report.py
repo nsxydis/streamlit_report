@@ -37,21 +37,9 @@ from streamlit.runtime.scriptrunner import get_script_run_ctx
 if Version(st.__version__) < Version("1.44.0"):
     from streamlit.source_util import get_pages
 
+# Otherwise we'll use an alternate method for tracking pages
 else:
-    from streamlit.runtime.pages_manager import PagesManager
-    ctx = get_script_run_ctx()
-    p = PagesManager(ctx.main_script_path)
-    st.write(p.get_page_script())
-    st.write(p.get_pages())
-    
-    
-    # def get_pages(string: str = None):
-    #     pm = PagesManager(ctx.main_script_path)
-    #     dictionary = pm.get_pages()
-    #     dictionary['relative_page_hash'] = pm.current_page_script_hash
-    #     return dictionary
-
-    # get_pages = PagesManager(ctx.main_script_path).get_pages
+    get_pages: function = None
 
 class Report:
     def __init__(
@@ -90,9 +78,9 @@ class Report:
         try:
             self.html.pageName = self.pageName()
         except:
-            raise
             # If we're using the navigation options we'll have to keep track of script hashes
-            self.scriptHash = get_script_run_ctx().page_script_hash
+            ctx = get_script_run_ctx()
+            self.scriptHash = ctx.page_script_hash
 
             # Check if we've already redefined the hash
             if self.scriptHash in self.redefine:
@@ -127,38 +115,30 @@ class Report:
         if variable not in self.ss:
             self.ss[variable] = value
 
-    def new_pageName(self):
-        '''Gets and returns the filename of the running page'''
-        ctx = get_script_run_ctx()
-    
-        if ctx is None:
-            raise RuntimeError("Couldn't get script context")
-
-        page_name = Path(ctx.main_script_path).stem
-
-        # Print out the page name
-        print(page_name)
-
-        return page_name
-
     def pageName(self):
         '''Gets and returns the filename of the running page'''
         # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
         # NOTE: These modules were removed from st-pages (st_pages)
-        pages = get_pages('')
+
+        # Grab the script run context
         ctx = get_script_run_ctx()
 
-        # TEMP
-        st.write("TEMP")
-        st.write(pages)
-        st.write(ctx)
+        # NOTE: This code is obsolete in later versions of streamlit
+        if Version(st.__version__) < Version('1.44.0'):
+            pages = get_pages('')
+            hash_string = 'relative_page_hash'
+        
+        # Otherwise use the page manager to get page names
+        else:
+            pages = ctx.pages_manager.get_pages()
+            hash_string = 'page_script_hash'
 
         try:
             current_page = pages[ctx.page_script_hash]
         except KeyError:
             current_page = [
-                p for p in pages.values() if p["relative_page_hash"] == ctx.page_script_hash
+                p for p in pages.values() if p[hash_string] == ctx.page_script_hash
             ][0]
 
         return current_page['page_name']
