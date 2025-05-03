@@ -1,12 +1,13 @@
 [project]
 name = "streamlit-report"
-version = "0.5.0a"
+version = "0.0.5-alpha"
 description = ""
 authors = [
     {name = "Nick Xydis",email = "nsxydis@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
+# Note these are the versions tested with, not necessarily the required versions
 dependencies = [
     "polars (>=1.29.0,<2.0.0)",
     "markdown (>=3.8,<4.0)",
