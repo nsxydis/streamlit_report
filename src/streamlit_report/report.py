@@ -17,8 +17,14 @@ Purpose: Streamline creation of html reports when creating a streamlit dashboard
 
 Author: Nick Xydis
 '''
+# Type hints
+from __future__ import annotations
 
+# Standard imports
+from pathlib import Path
 import streamlit as st
+
+# Streamlit imports
 try:
     from streamlit_report import htmlClass
 except:
@@ -26,10 +32,12 @@ except:
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-try:
-    from streamlit.source_util import get_pages
-except:
-    from streamlit.runtime.pages_manager import get_pages
+# try:
+#     from streamlit.source_util import get_pages
+# except:
+#     from streamlit.runtime.pages_manager import PagesManager
+#     temp_PagesManager = PagesManager()
+#     get_pages = temp_PagesManager.get_pages()
 
 class Report:
     def __init__(
@@ -106,6 +114,17 @@ class Report:
 
     def pageName(self):
         '''Gets and returns the filename of the running page'''
+        ctx = get_script_run_ctx()
+    
+        if ctx is None:
+            raise RuntimeError("Couldn't get script context")
+
+        page_name = Path(ctx.main_script_path).stem
+
+        return page_name
+
+    def old_pageName(self):
+        '''Gets and returns the filename of the running page'''
         # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
         # NOTE: These modules were removed from st-pages (st_pages)
@@ -171,7 +190,12 @@ class Report:
         # Return the selection
         return selection
     
-    def multiselect(self, label, options, **kwargs):
+    def multiselect(
+            self, 
+            label: str, 
+            options: list[str] | DataFrame,  # type: ignore
+            **kwargs
+            ) -> list:
         '''Mimics st.multiselect'''
         # streamlit 
         values = st.multiselect(label, options = options, **kwargs)
@@ -185,7 +209,10 @@ class Report:
             else:
                 self.html.write("Nothing selected")
 
-    def text(self, body, **kwargs):
+        # Return the selected data
+        return values
+
+    def text(self, body, **kwargs) -> None:
         '''Mimics st.text'''
         # streamlit
         st.text(body, **kwargs)
