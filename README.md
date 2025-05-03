@@ -25,6 +25,12 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
+## Version 0.0.5-alpha
+- updated support to account for migrated get_pages function in streamlit Version 1.44
+- fixed bug in multiselect code
+- added support for navigation based multipage applications
+- added some minor QoL updates via type hints
+
 ## Version 0.0.4-alpha
 - added st.date_input support
 - added st.multiselect support
