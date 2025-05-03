@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "streamlit-report", from = "src"}]
+packages = [{include = "streamlit_report", from = "src"}]
 
 
 [build-system]
