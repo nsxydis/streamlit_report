@@ -17,8 +17,9 @@ Purpose: Streamline creation of html reports when creating a streamlit dashboard
 
 Author: Nick Xydis
 '''
-# Type hints
+# Type hints & versioning
 from __future__ import annotations
+from packaging.version import Version
 
 # Standard imports
 from pathlib import Path
@@ -28,16 +29,29 @@ import streamlit as st
 try:
     from streamlit_report import htmlClass
 except:
-    import htmlClass
+    import htmlClass # type: ignore
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
-# try:
-#     from streamlit.source_util import get_pages
-# except:
-#     from streamlit.runtime.pages_manager import PagesManager
-#     temp_PagesManager = PagesManager()
-#     get_pages = temp_PagesManager.get_pages()
+# If we're using an earlier version of streamlit, the original get_pages method is viable
+if Version(st.__version__) < Version("1.44.0"):
+    from streamlit.source_util import get_pages
+
+else:
+    from streamlit.runtime.pages_manager import PagesManager
+    ctx = get_script_run_ctx()
+    p = PagesManager(ctx.main_script_path)
+    st.write(p.get_page_script())
+    st.write(p.get_pages())
+    
+    
+    # def get_pages(string: str = None):
+    #     pm = PagesManager(ctx.main_script_path)
+    #     dictionary = pm.get_pages()
+    #     dictionary['relative_page_hash'] = pm.current_page_script_hash
+    #     return dictionary
+
+    # get_pages = PagesManager(ctx.main_script_path).get_pages
 
 class Report:
     def __init__(
@@ -76,6 +90,7 @@ class Report:
         try:
             self.html.pageName = self.pageName()
         except:
+            raise
             # If we're using the navigation options we'll have to keep track of script hashes
             self.scriptHash = get_script_run_ctx().page_script_hash
 
@@ -112,7 +127,7 @@ class Report:
         if variable not in self.ss:
             self.ss[variable] = value
 
-    def pageName(self):
+    def new_pageName(self):
         '''Gets and returns the filename of the running page'''
         ctx = get_script_run_ctx()
     
@@ -121,15 +136,23 @@ class Report:
 
         page_name = Path(ctx.main_script_path).stem
 
+        # Print out the page name
+        print(page_name)
+
         return page_name
 
-    def old_pageName(self):
+    def pageName(self):
         '''Gets and returns the filename of the running page'''
         # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
         # NOTE: These modules were removed from st-pages (st_pages)
-        pages = get_pages("")
+        pages = get_pages('')
         ctx = get_script_run_ctx()
+
+        # TEMP
+        st.write("TEMP")
+        st.write(pages)
+        st.write(ctx)
 
         try:
             current_page = pages[ctx.page_script_hash]
