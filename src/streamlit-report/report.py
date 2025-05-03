@@ -25,8 +25,11 @@ except:
     import htmlClass
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
-from streamlit.source_util import get_pages
 
+try:
+    from streamlit.source_util import get_pages
+except:
+    from streamlit.runtime.pages_manager import get_pages
 
 class Report:
     def __init__(
