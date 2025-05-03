@@ -21,9 +21,9 @@ import polars as pl
 import os
 
 class html:
-    def __init__(self, styleFile = 'style.html'):
+    def __init__(self, styleFile: str = None):
         # Specify a style file to use
-        self.styleFile = styleFile
+        self.styleFile = styleFile if styleFile else 'style.html'
 
         # Note this code is static for all pages
         self.head = self.header()
@@ -51,7 +51,7 @@ class html:
         # Init the body and sidebar sections
         self.clear()
 
-    def clear(self):
+    def clear(self) -> None:
         '''Clears page code, including if the current page has been generated before'''
         pageContent = [
             self.body,
@@ -66,7 +66,7 @@ class html:
         # Reset trigger variables
         self.altairCharts = False
 
-    def increment(self, allowDuplicates : 'bool' = False):
+    def increment(self, allowDuplicates : 'bool' = False) -> None:
         '''Increments the page or goes to the given page and clears its content'''
         # If we're allowing duplicates or have a new page...
         if allowDuplicates == True or self.pageName not in self.pageNames:
@@ -77,11 +77,14 @@ class html:
         elif allowDuplicates == False:
             # Navigate to this page
             self.page = self.pageNames[self.pageName]
+
+        # Make sure the page is an int
+        self.page = int(self.page)
         
         # Clear and/or initialize the page
         self.clear()
 
-    def header(self):
+    def header(self) -> str:
         '''Default header code'''
         # Starting code
         head = '''
@@ -117,7 +120,7 @@ class html:
 
         return head
 
-    def tabCode(self):
+    def tabCode(self) -> str:
         '''Writes the tab javascript code for tab navigation'''
         code = '''
         <script>
@@ -225,7 +228,7 @@ class html:
         # Close the element
         self.html('</div>\n')
 
-    def pageTabs(self):
+    def pageTabs(self) -> str:
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
         NOTE: This code is similar but functionally different to the tabBar function'''
@@ -258,7 +261,7 @@ class html:
 
             # Check the page contents aren't blank
             # If they are, remove the page from the list
-            if self.body[item] == '':
+            if self.body[item] == '' and name in self.pageOrder:
                 self.pageOrder.remove(name)
 
         # If we only have one page left, return an empty string
@@ -280,7 +283,7 @@ class html:
         # code += '</div>\n'
         return code
             
-    def altairHeader(self):
+    def altairHeader(self) -> str:
         '''Optional code to add to the header if we're using altair charts'''
         import altair as alt
 
@@ -364,21 +367,20 @@ class html:
         # Write the code
         self.html(code)
 
-    def getPageName(self, number):
+    def getPageName(self, number: int) -> str:
         '''For the given page number, returns the page name'''
         # Default value is None
         n = None
         
         # Loop through all the pages we collected data for
-        for name in self.pageNames:
-            if number == self.pageNames[name]:
-                n = name
-                break
+        for key, value in self.pageNames.items():
+            if value == number:
+                n = key
 
         # Return the page name
         return n
 
-    def generateReport(self):
+    def generateReport(self) -> str:
         # Create the main body block
         self.main = '''<body onload = "openNav()">
         <div id = "pageNav" class = "sidenav">
