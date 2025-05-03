@@ -8,10 +8,10 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "streamlit (>=1.45.0,<2.0.0)",
     "polars (>=1.29.0,<2.0.0)",
     "markdown (>=3.8,<4.0)",
-    "altair (>=5.5.0,<6.0.0)"
+    "altair (>=5.5.0,<6.0.0)",
+    "streamlit (>=1.45.0,<2.0.0)"
 ]
 
 [tool.poetry]
