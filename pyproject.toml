@@ -1,6 +1,6 @@
 [project]
 name = "streamlit-report"
-version = "0.0.5-alpha"
+version = "0.0.6"
 description = ""
 authors = [
     {name = "Nick Xydis",email = "nsxydis@gmail.com"}
