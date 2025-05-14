@@ -27,10 +27,7 @@ from pathlib import Path
 import streamlit as st
 
 # Streamlit imports
-try:
-    from streamlit_report import htmlClass
-except:
-    import htmlClass # type: ignore
+from streamlit_report import htmlClass
 from contextlib import contextmanager
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
@@ -77,7 +74,7 @@ class Report:
         self.nav = False
         
         # If we already have an html report going, preserve it
-        self.html: htmlClass = self.ss.html
+        self.html: htmlClass.html = self.ss.html
 
         # Get and store the name of the current page
         try:
@@ -157,7 +154,7 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             self.html.write(text)
 
-    def markdown(self, text: 'str', unsafe_allow_html: 'bool' = False, **kwargs) -> None:
+    def markdown(self, text: 'str', **kwargs) -> None:
         '''Mimics st.markdown'''
         # streamlit
         st.markdown(text, **kwargs)
@@ -166,7 +163,8 @@ class Report:
         if self.ss['htmlReport'] and self.ignore == False:
             
             # If we're allowing unsafe html, write to the report directly
-            if unsafe_allow_html:
+            # NOTE: Removed explicit callout for standard streamlit usage
+            if 'unsafe_allow_html' in kwargs and kwargs['unsafe_allow_html']:
                 self.html.html(text)
             
             # Otherwise, write to the report
@@ -176,8 +174,8 @@ class Report:
     def dataframe(
             self, 
             df: DataFrame,      # type: ignore 
-            height = '400px', 
-            width = '60%', 
+            height: str = '400px', 
+            width: str = '60%', 
             **kwargs
             ) -> None:
         '''Mimics st.dataframe'''
