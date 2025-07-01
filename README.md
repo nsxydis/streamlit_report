@@ -1,7 +1,7 @@
 # How to use
 1. Install the package into your environment:
 ```bash
-pip install streamlit_report
+pip install streamlit-report
 ```
 2. Call the report class in your program:
 ```python
@@ -25,7 +25,13 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
-## Version 0.0.5-alpha
+## Version 0.0.7
+- updated default style.html file to improve dataframe display on reports
+- removed height & width functionality from r.dataframe commands
+    * This can now be specified globally in the dataframe-container & dataframe CSS
+- removed dependency version requirements on imported modules
+
+## Version 0.0.6
 - updated support to account for migrated get_pages function in streamlit Version 1.44
 - fixed bug in multiselect code
 - added support for navigation based multipage applications
@@ -85,11 +91,10 @@ Added basic functionality including multipage support, altair graphs, and some i
 + [ ] st.image
 + [ ] st.logo
 + [ ] st.page_link
-+ [ ] st.navigation
++ [x] st.navigation
 + [ ] resizable sidebar
 + [ ] _streamlit.write_ support for list, dictionary types
 + [ ] option to only replace page content when a button is pressed
-+ [ ] pdf report option
 
 ## Unsupported Features
-- Pending
+- pdf report option
