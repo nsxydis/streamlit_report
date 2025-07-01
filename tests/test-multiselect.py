@@ -1,5 +1,5 @@
 '''
-Purpose: test st.multiselect
+Purpose: test r.multiselect
 '''
 
 import streamlit as st
