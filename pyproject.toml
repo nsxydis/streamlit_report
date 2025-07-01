@@ -1,18 +1,19 @@
 [project]
 name = "streamlit-report"
-version = "0.0.6"
+version = "0.0.7"
 description = ""
 authors = [
     {name = "Nick Xydis",email = "nsxydis@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
-# Note these are the versions tested with, not necessarily the required versions
+requires-python = ">=3.9"   # Tested with 3.13.3
+
+# NOTE: Some versions may not be compatible
 dependencies = [
-    "polars (>=1.29.0,<2.0.0)",
-    "markdown (>=3.8,<4.0)",
-    "altair (>=5.5.0,<6.0.0)",
-    "streamlit (>=1.45.0,<2.0.0)"
+    "polars",   # Tested with 1.31.0
+    "markdown", # Tested with 3.8.2
+    "altair",   # Tested with 5.5.0
+    "streamlit" # Tested with 1.46.1
 ]
 
 [tool.poetry]
