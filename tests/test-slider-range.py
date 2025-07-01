@@ -1,5 +1,5 @@
 '''
-Purpose: test st.slider for range selections
+Purpose: test r.slider for range selections
 '''
 
 import streamlit as st
