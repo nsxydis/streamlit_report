@@ -178,7 +178,10 @@ class Report:
             width: str = '60%', 
             **kwargs
             ) -> None:
-        '''Mimics st.dataframe'''
+        '''
+        Mimics st.dataframe
+        NOTE: The height and width variables are no longer used.
+        '''
         # streamlit
         st.dataframe(df, **kwargs)
 

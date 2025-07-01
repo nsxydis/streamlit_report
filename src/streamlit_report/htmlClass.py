@@ -355,7 +355,8 @@ class html:
         table = df.to_html(index = False)
 
         # Create an iframe around the table
-        code = f'''<div style = "overflow:auto; height:{height}; width:{width}">
+        # Version 0.0.7 -- Change style definition to style.
+        code = f'''<div class = "dataframe-container">
         {table}
         </div>
         '''
