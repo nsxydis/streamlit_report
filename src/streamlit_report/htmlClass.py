@@ -21,9 +21,9 @@ import polars as pl
 import os
 
 class html:
-    def __init__(self, styleFile: str = None):
+    def __init__(self, style_file: str = None):
         # Specify a style file to use
-        self.styleFile = styleFile if styleFile else 'style.html'
+        self.style_file = style_file if style_file else 'style.html'
 
         # Note this code is static for all pages
         self.head = self.header()
@@ -33,50 +33,53 @@ class html:
         # Note these fields will be unique to each page
         self.body = {}              # Dictionary of body code for each page
         self.sidebar = {}           # Dictionary for sidebar code
-        self.chartScript = {}       # Dictionary for chart scripts
-        self.pageNames = {}         # Names of each page associated with a page number
-        self.pageOrder = []         # Order that the pages should be displayed in
+        self.chart_script = {}       # Dictionary for chart scripts
+        self.page_names = {}         # Names of each page associated with a page number
+        self.page_order = []         # Order that the pages should be displayed in
         
         self.charts = 0             # Chart counter
-        self.altairCharts = False   # Chart boolean
+        self.altair_charts = False   # Chart boolean
         self.side = False           # If true, writes to the sidebar
-        self.lineBreak = True       # If true, puts a break between certain elements (charts, dataframes...)
+        self.line_break = True       # If true, puts a break between certain elements (charts, dataframes...)
 
         # Tab and page counts
         self.page = 1               # The current page number
-        self.pageName = ''          # Name of the current page
-        self.tabCount = 0           # Current tab count
-        self.tabGroup = 0           # Current tab group
+        self.page_name = ''          # Name of the current page
+        self.tab_count = 0           # Current tab count
+        self.tab_group = 0           # Current tab group
+
+        # Plotly chart tracking
+        self.has_plotly_charts: bool = False
 
         # Init the body and sidebar sections
         self.clear()
 
     def clear(self) -> None:
         '''Clears page code, including if the current page has been generated before'''
-        pageContent = [
+        page_content = [
             self.body,
             self.sidebar,
-            self.chartScript
+            self.chart_script
         ]
 
         # Loop through each of the pages with content
-        for item in pageContent:
+        for item in page_content:
             item[self.page] = ''
 
         # Reset trigger variables
-        self.altairCharts = False
+        self.altair_charts = False
 
-    def increment(self, allowDuplicates : 'bool' = False) -> None:
+    def increment(self, allow_duplicates : 'bool' = False) -> None:
         '''Increments the page or goes to the given page and clears its content'''
         # If we're allowing duplicates or have a new page...
-        if allowDuplicates == True or self.pageName not in self.pageNames:
-            self.page = len(self.pageNames) + 1
-            self.pageNames[self.pageName] = self.page
+        if allow_duplicates == True or self.page_name not in self.page_names:
+            self.page = len(self.page_names) + 1
+            self.page_names[self.page_name] = self.page
         
         # Otherwise, the tab already exists and needs to be overwritten
-        elif allowDuplicates == False:
+        elif allow_duplicates == False:
             # Navigate to this page
-            self.page = self.pageNames[self.pageName]
+            self.page = self.page_names[self.page_name]
 
         # Make sure the page is an int
         self.page = int(self.page)
@@ -102,7 +105,7 @@ class html:
 
         # Try to read from the dashboard directory first
         try:
-            with open(self.styleFile) as f:
+            with open(self.style_file) as f:
                 for line in f.readlines():
                     text += line
         
@@ -111,7 +114,7 @@ class html:
             text = ''
             # Get the directory of this module
             dirpath = os.path.dirname(__file__)
-            with open(os.path.join(dirpath, self.styleFile)) as f:
+            with open(os.path.join(dirpath, self.style_file)) as f:
                 for line in f.readlines():
                     text += line
 
@@ -205,21 +208,21 @@ class html:
         '''
         return code
 
-    def tabBar(self, items: 'list'):
+    def tab_bar(self, items: 'list'):
         '''Creates a tab bar with buttons for each item in the list'''
         # Open the div element
         self.html(f'<div class = "tab">\n')
 
         # Increment the tab group
-        self.tabGroup += 1
+        self.tab_group += 1
         
         # Add each of the tabs
         for item in items:
-            self.tabCount += 1
+            self.tab_count += 1
             code = f'''
-            <button class = "page_{self.page}_group_{self.tabGroup}_tablink" 
-            onclick = "openTab( event, {self.page}, {self.tabGroup}, 
-                                'page_{self.page}_{item}_{self.tabCount}')">
+            <button class = "page_{self.page}_group_{self.tab_group}_tablink" 
+            onclick = "openTab( event, {self.page}, {self.tab_group}, 
+                                'page_{self.page}_{item}_{self.tab_count}')">
                 {item}
             </button>
             '''
@@ -228,53 +231,53 @@ class html:
         # Close the element
         self.html('</div>\n')
 
-    def pageTabs(self) -> str:
+    def page_tabs(self) -> str:
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
-        NOTE: This code is similar but functionally different to the tabBar function'''
+        NOTE: This code is similar but functionally different to the tab_bar function'''
         # Initialize
         code = ''
         order = self.order
 
         # Increment the tab group
-        self.tabGroup += 1
+        self.tab_group += 1
 
         # Determine the order to create the tabs
-        self.pageOrder = []
+        self.page_order = []
 
         # Start with the provided order
         if order:
             for item in order:
                 # Only add the item to our page tabs if it exists in our data
-                if item in self.pageNames:
-                    self.pageOrder.append(item)
+                if item in self.page_names:
+                    self.page_order.append(item)
 
         # Add any remaining tabs in the order they were generated
-        for item in self.pageNames:
-            if item not in self.pageOrder:
-                self.pageOrder.append(item)
+        for item in self.page_names:
+            if item not in self.page_order:
+                self.page_order.append(item)
         
         # Remove pages that don't have content
         for item in self.body:
             # Get the name of the page if we have multiple pages
-            name = self.getPageName(item)
+            name = self.get_page_name(item)
 
             # Check the page contents aren't blank
             # If they are, remove the page from the list
-            if self.body[item] == '' and name in self.pageOrder:
-                self.pageOrder.remove(name)
+            if self.body[item] == '' and name in self.page_order:
+                self.page_order.remove(name)
 
         # If we only have one page left, return an empty string
-        if len(self.pageOrder) <= 1:
+        if len(self.page_order) <= 1:
             code = ''
             return code
 
         # Add a tab for each page
-        for item in self.pageOrder:
-            self.tabCount += 1
+        for item in self.page_order:
+            self.tab_count += 1
             code += f'''
             <a href = "#{item}" class = "page_link" 
-            onclick = 'openPage( event, "{item}_{self.pageNames[item]}")'>
+            onclick = 'openPage( event, "{item}_{self.page_names[item]}")'>
                 {item}
             </a>
             '''
@@ -283,25 +286,34 @@ class html:
         # code += '</div>\n'
         return code
             
-    def altairHeader(self) -> str:
-        '''Optional code to add to the header if we're using altair charts'''
+    def altair_header(self) -> str:
+        '''
+        Optional code to add to the header if we're using altair charts
+        '''
         import altair as alt
 
-        altairChartStyle = '''
+        altair_chartstyle = '''
             <script src="https://cdn.jsdelivr.net/npm/vega@{vega_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-lite@{vegalite_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-embed@{vegaembed_version}"></script>
-        </head>'''
+        '''
 
         # Update the chart information
-        altairChartStyle = altairChartStyle.format(
+        altair_chartstyle = altair_chartstyle.format(
             vega_version=alt.VEGA_VERSION,
             vegalite_version=alt.VEGALITE_VERSION,
-            vegaembed_version=alt.VEGAEMBED_VERSION
+            vegaembed_version=alt.VEGAEMBED_VERSION,
         )
 
         # Return the code
-        return altairChartStyle
+        return altair_chartstyle
+    
+    def plotly_header(self) -> str:
+        '''
+        Optional code to add plotly code to the header file.
+        '''
+        from streamlit_report import plotly_extractor
+        return plotly_extractor.get_header_html()
     
     def write(self, text):
         '''HTML for the write command'''
@@ -311,29 +323,29 @@ class html:
         # Write the code
         self.html(code)
 
-    def altairChart(self, chart):
+    def altair_chart(self, chart):
         '''HTML to display an altair chart'''
         # Increment our global count by one
         self.charts += 1
         chartNumber = self.charts
 
         # Chart code
-        chartCode = f'''<div id="vis{chartNumber}"></div>\n'''
+        chart_code = f'''<div id="vis{chartNumber}"></div>\n'''
 
-        # If lineBreak, then add a <br> to the chart code
-        if self.lineBreak:
-            chartCode += " \n <br> \n"
+        # If line_break, then add a <br> to the chart code
+        if self.line_break:
+            chart_code += " \n <br> \n"
 
         # Write the chart code
-        self.html(chartCode)
+        self.html(chart_code)
 
         # If we're running for the first time, add the script code
-        if self.altairCharts == False:
-            self.chartScript[self.page] += '''<script type="text/javascript">\n'''
-            self.altairCharts = True
+        if self.altair_charts == False:
+            self.chart_script[self.page] += '''<script type="text/javascript">\n'''
+            self.altair_charts = True
         
         # Append to the chart script
-        self.chartScript[self.page] += f'''vegaEmbed('#vis{chartNumber}', {chart.to_json(indent = None)}).catch(console.error);\n'''
+        self.chart_script[self.page] += f'''vegaEmbed('#vis{chartNumber}', {chart.to_json(indent = None)}).catch(console.error);\n'''
 
     def html(self, code):
         '''Adds the code to the body or sidebar'''
@@ -362,26 +374,26 @@ class html:
         '''
 
         # Line break
-        if self.lineBreak:
+        if self.line_break:
             code += "<br>"
 
         # Write the code
         self.html(code)
 
-    def getPageName(self, number: int) -> str:
+    def get_page_name(self, number: int) -> str:
         '''For the given page number, returns the page name'''
         # Default value is None
         n = None
         
         # Loop through all the pages we collected data for
-        for key, value in self.pageNames.items():
+        for key, value in self.page_names.items():
             if value == number:
                 n = key
 
         # Return the page name
         return n
 
-    def generateReport(self) -> str:
+    def generate_report(self) -> str:
         # Create the main body block
         self.main = '''<body onload = "openNav()">
         <div id = "pageNav" class = "sidenav">
@@ -389,18 +401,18 @@ class html:
         '''
 
         # If we have multiple pages, add their buttons to the sidebar
-        if len(self.pageNames) > 1:
-            self.main += self.pageTabs()
+        if len(self.page_names) > 1:
+            self.main += self.page_tabs()
 
         # NOTE: Sidebar now is grouped with sidenav by default
         for item in self.sidebar:
             # Get the name of the page if we have multiple pages
-            name = self.getPageName(item)
+            name = self.get_page_name(item)
             barID = f'id = "{name}_{item}_sidebar"' if name else ''
 
             display = ''
-            if len(self.pageOrder) > 0:
-                if name == self.pageOrder[0]:
+            if len(self.page_order) > 0:
+                if name == self.page_order[0]:
                     display += 'style = "display: block"'
                 else:
                     display += 'style = "display: none"'
@@ -418,12 +430,12 @@ class html:
 
         for item in self.body:
             # Get the name of the page if we have multiple pages
-            name = self.getPageName(item)
+            name = self.get_page_name(item)
             id = f'id = "{name}_{item}"' if name else ''
 
             display = 'style = "margin-left: 0;'
-            if len(self.pageOrder) > 0:
-                if name == self.pageOrder[0]:
+            if len(self.page_order) > 0:
+                if name == self.page_order[0]:
                     display += 'display: block"'
                 else:
                     display += 'display: none"'
@@ -435,24 +447,30 @@ class html:
                 {self.body[item]}
             </div>'''
         
-        # Add the chartScript if there is some
+        # Add the chart_script if there is some
         first = True
-        altairHead = ''
-        for item in self.chartScript:
+        altair_head = ''
+
+        # If we have plotly charts, add that to the html head
+        if self.has_plotly_charts:
+            altair_head += self.plotly_header()
+
+        # Loop through each altair chart
+        for item in self.chart_script:
             # Check that there's altair code to add
-            if self.chartScript[item] != '':
+            if self.chart_script[item] != '':
                 # If it's the first time, add to our altair header
                 if first:
-                    altairHead = self.altairHeader()
+                    altair_head += self.altair_header()
                     first = False
                 
                 # Add the altair script code
                 self.main += f'''
-                    {self.chartScript[item]}
+                    {self.chart_script[item]}
                 </script>'''
         
         # Close the code block
-        self.head += altairHead + '\n</head>'
+        self.head += altair_head + '\n</head>'
         self.main += "</body>\n"
         self.report = self.head + self.main + self.script + '</html>'
 

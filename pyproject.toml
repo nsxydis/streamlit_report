@@ -1,6 +1,6 @@
 [project]
 name = "streamlit-report"
-version = "0.0.7"
+version = "0.0.8"
 description = ""
 authors = [
     {name = "Nick Xydis",email = "nsxydis@gmail.com"}
@@ -13,7 +13,8 @@ dependencies = [
     "polars",   # Tested with 1.31.0
     "markdown", # Tested with 3.8.2
     "altair",   # Tested with 5.5.0
-    "streamlit" # Tested with 1.46.1
+    "streamlit", # Tested with 1.46.1
+    "plotly[express]", # Tested with 6.5.2
 ]
 
 [tool.poetry]
