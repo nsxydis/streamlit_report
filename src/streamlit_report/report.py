@@ -43,30 +43,37 @@ else:
 class Report:
     def __init__(
             self, 
-            duplicatePages: bool = False, 
-            pageOrder: list = None,
+            duplicate_pages: bool = False, 
+            page_order: list = None,
             style_file: str = None,
-            startActive: bool = False,
+            start_active: bool = False,
+            **kwargs
         ):
         '''
-        duplicatePages: Allow for the program to create multiple pages for 
+        duplicate_pages:Allow for the program to create multiple pages for 
                         files that have the same name.
-        pageOrder:      Order that the pages should appear in, using the names of the page.
-        style_file:      Name of the .html file that specifies the styles to use. If none is 
+        page_order:     Order that the pages should appear in, using the names of the page.
+        style_file:     Name of the .html file that specifies the styles to use. If none is 
                         defined, uses the default styles. 
-        startActive:    True / False option. If True, reports will default to generating the
+        start_active:   True / False option. If True, reports will default to generating the
                         html code. 
                         NOTE: This only takes effect on the first module to initialize a report.
         '''
+        # Section for backwards compatibility
+        style_file = kwargs.get('styleFile', style_file)
+        duplicate_pages = kwargs.get('duplicatePages', duplicate_pages)
+        page_order = kwargs.get('pageOrder', page_order)
+        start_active = kwargs.get('startActive', start_active)
+
         # Session_state shorthand
         self.session_state = st.session_state
         self.ss = self.session_state
         
         # Inititialization
         self.style_file = style_file
-        self.init('html_report', startActive)
+        self.init('html_report', start_active)
         self.init('html', htmlClass.html(self.style_file))
-        self.duplicatePages = duplicatePages
+        self.duplicate_pages = duplicate_pages
 
         # Redefine page numbers
         self.init('streamlit_report-htmlRedefinePages', {})
@@ -92,10 +99,10 @@ class Report:
                 self.html.page_name = self.script_hash
 
         # Clear the page data if we're regenerating the code
-        self.html.increment(self.duplicatePages)
+        self.html.increment(self.duplicate_pages)
 
         # Set the default page order of the report
-        self.html.order = pageOrder
+        self.html.order = page_order
 
         # Option to ignore fields from the report
         self.ignore = False
