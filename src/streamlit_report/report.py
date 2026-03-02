@@ -21,6 +21,7 @@ Author: Nick Xydis
 from __future__ import annotations
 from packaging.version import Version
 from streamlit.navigation.page import StreamlitPage
+from streamlit.delta_generator import DeltaGenerator
 
 # Standard imports
 from pathlib import Path
@@ -355,7 +356,7 @@ class Report:
         
         # Create the html tab buttons, if we're creating a report
         if self.ss['html_report'] and self.ignore == False:
-            self.html.tabBar(items)
+            self.html.tab_bar(items)
 
         # streamlit
         # Create the tabs
@@ -389,14 +390,17 @@ class Report:
         for t in tabs_list:
             yield t.combo
 
-    def altair_chart(self, chart: altair.Chart, **kwargs) -> None: # type: ignore
+    def altair_chart(self, chart: altair.Chart, **kwargs) -> DeltaGenerator: # type: ignore
         '''Mimics the altair_chart function of streamlit'''
         # Streamlit
-        st.altair_chart(chart, **kwargs)
+        delta_gen = st.altair_chart(chart, **kwargs)
 
         # HTML
         if self.ss['html_report'] and self.ignore == False:
             self.html.altair_chart(chart)
+
+        # Return the delta generator
+        return delta_gen
 
     def download(self, report_name: 'str' = 'output') -> None:
         '''
@@ -424,6 +428,45 @@ class Report:
             self.ss.html = htmlClass.html(style_file = self.style_file)
         else:
             self.ss['html_report'] = True
+
+    def plotly_chart(
+            self, 
+            chart, 
+            override_streamlit_colors: bool = True,
+            **kwargs
+            ) -> DeltaGenerator:
+        '''
+        Plot a plotly chart
+            chart:  Plotly chart
+            override_streamlit_colors:  True/False -- If true, will override the default streamlit color scheme.
+                                        NOTE: This is required because streamlit will override plotly colors and
+                                        result in a black/white html output if not overridden.
+                                        NOTE: This may result in the colors displaying on streamlit to change
+                                        once report generation is triggered.
+        '''
+        # Update the html class that we have plotly charts
+        self.html.has_plotly_charts = True
+
+        # If we're overriding streamlit's color scheme, do so here
+        if override_streamlit_colors:
+            import plotly.io as pio
+            pio.templates.default = 'plotly'
+        
+        # Show the plotly chart
+        chart_state = st.plotly_chart(chart, **kwargs)
+
+        # If we embedding the chart...
+        if self.ss['html_report'] == True:
+            # Import the chart extractor
+            from streamlit_report import plotly_extractor
+            
+            # Write the chart to the html body
+            self.ss.html.html(
+                plotly_extractor.get_body_html(chart)
+            )
+
+        # Return the streamlit chart state
+        return chart_state
 
 class tab:
     def __init__(self, st_tab, report, id, group, display):

@@ -48,6 +48,9 @@ class html:
         self.tab_count = 0           # Current tab count
         self.tab_group = 0           # Current tab group
 
+        # Plotly chart tracking
+        self.has_plotly_charts: bool = False
+
         # Init the body and sidebar sections
         self.clear()
 
@@ -205,7 +208,7 @@ class html:
         '''
         return code
 
-    def tabBar(self, items: 'list'):
+    def tab_bar(self, items: 'list'):
         '''Creates a tab bar with buttons for each item in the list'''
         # Open the div element
         self.html(f'<div class = "tab">\n')
@@ -231,7 +234,7 @@ class html:
     def page_tabs(self) -> str:
         '''Adds the pages to the sidebar in the order generated or in an order specified
         NOTE: The order is a list of the page names, not the page numbers as those can change
-        NOTE: This code is similar but functionally different to the tabBar function'''
+        NOTE: This code is similar but functionally different to the tab_bar function'''
         # Initialize
         code = ''
         order = self.order
@@ -284,24 +287,33 @@ class html:
         return code
             
     def altair_header(self) -> str:
-        '''Optional code to add to the header if we're using altair charts'''
+        '''
+        Optional code to add to the header if we're using altair charts
+        '''
         import altair as alt
 
         altair_chartstyle = '''
             <script src="https://cdn.jsdelivr.net/npm/vega@{vega_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-lite@{vegalite_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-embed@{vegaembed_version}"></script>
-        </head>'''
+        '''
 
         # Update the chart information
         altair_chartstyle = altair_chartstyle.format(
             vega_version=alt.VEGA_VERSION,
             vegalite_version=alt.VEGALITE_VERSION,
-            vegaembed_version=alt.VEGAEMBED_VERSION
+            vegaembed_version=alt.VEGAEMBED_VERSION,
         )
 
         # Return the code
         return altair_chartstyle
+    
+    def plotly_header(self) -> str:
+        '''
+        Optional code to add plotly code to the header file.
+        '''
+        from streamlit_report import plotly_extractor
+        return plotly_extractor.get_header_html()
     
     def write(self, text):
         '''HTML for the write command'''
@@ -438,12 +450,18 @@ class html:
         # Add the chart_script if there is some
         first = True
         altair_head = ''
+
+        # If we have plotly charts, add that to the html head
+        if self.has_plotly_charts:
+            altair_head += self.plotly_header()
+
+        # Loop through each altair chart
         for item in self.chart_script:
             # Check that there's altair code to add
             if self.chart_script[item] != '':
                 # If it's the first time, add to our altair header
                 if first:
-                    altair_head = self.altair_header()
+                    altair_head += self.altair_header()
                     first = False
                 
                 # Add the altair script code
