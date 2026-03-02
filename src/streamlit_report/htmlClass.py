@@ -27,7 +27,7 @@ class html:
 
         # Note this code is static for all pages
         self.head = self.header()
-        self.script = self.tabCode()
+        self.script = self.tab_code()
         self.report = None          # This will contain the code of the full report
 
         # Note these fields will be unique to each page
@@ -68,6 +68,7 @@ class html:
 
         # Reset trigger variables
         self.altair_charts = False
+        self.has_plotly_charts = False
 
     def increment(self, allow_duplicates : 'bool' = False) -> None:
         '''Increments the page or goes to the given page and clears its content'''
@@ -123,7 +124,7 @@ class html:
 
         return head
 
-    def tabCode(self) -> str:
+    def tab_code(self) -> str:
         '''Writes the tab javascript code for tab navigation'''
         code = '''
         <script>
@@ -208,7 +209,7 @@ class html:
         '''
         return code
 
-    def tab_bar(self, items: 'list'):
+    def tab_bar(self, items: list):
         '''Creates a tab bar with buttons for each item in the list'''
         # Open the div element
         self.html(f'<div class = "tab">\n')
@@ -292,21 +293,21 @@ class html:
         '''
         import altair as alt
 
-        altair_chartstyle = '''
+        altair_chart_style = '''
             <script src="https://cdn.jsdelivr.net/npm/vega@{vega_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-lite@{vegalite_version}"></script>
             <script src="https://cdn.jsdelivr.net/npm/vega-embed@{vegaembed_version}"></script>
         '''
 
         # Update the chart information
-        altair_chartstyle = altair_chartstyle.format(
+        altair_chart_style = altair_chart_style.format(
             vega_version=alt.VEGA_VERSION,
             vegalite_version=alt.VEGALITE_VERSION,
             vegaembed_version=alt.VEGAEMBED_VERSION,
         )
 
         # Return the code
-        return altair_chartstyle
+        return altair_chart_style
     
     def plotly_header(self) -> str:
         '''
@@ -327,10 +328,10 @@ class html:
         '''HTML to display an altair chart'''
         # Increment our global count by one
         self.charts += 1
-        chartNumber = self.charts
+        chart_number = self.charts
 
         # Chart code
-        chart_code = f'''<div id="vis{chartNumber}"></div>\n'''
+        chart_code = f'''<div id="vis{chart_number}"></div>\n'''
 
         # If line_break, then add a <br> to the chart code
         if self.line_break:
@@ -345,7 +346,7 @@ class html:
             self.altair_charts = True
         
         # Append to the chart script
-        self.chart_script[self.page] += f'''vegaEmbed('#vis{chartNumber}', {chart.to_json(indent = None)}).catch(console.error);\n'''
+        self.chart_script[self.page] += f'''vegaEmbed('#vis{chart_number}', {chart.to_json(indent = None)}).catch(console.error);\n'''
 
     def html(self, code):
         '''Adds the code to the body or sidebar'''

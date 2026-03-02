@@ -114,7 +114,7 @@ class Report:
         self.report_label = ' selection:'
 
         # Define the text to display after a text field
-        self.textLabel = ' input:'
+        self.text_label = ' input:'
 
         # Optional Function to convert dates
         self.date_format_func = None
@@ -251,7 +251,7 @@ class Report:
 
         # If we're making a report, add to it
         if self.ss['html_report'] and self.ignore == False:
-            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            self.html.write(f'{self.heading} {label}{self.text_label}')
             if value:
                 self.html.write(f'{value}')
             else:
@@ -266,7 +266,7 @@ class Report:
 
         # If we're making a report, add to it
         if self.ss['html_report'] and self.ignore == False:
-            self.html.write(f'{self.heading} {label}{self.textLabel}')
+            self.html.write(f'{self.heading} {label}{self.text_label}')
             if value:
                 self.html.write(f'{value}')
             else:
