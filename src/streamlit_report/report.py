@@ -44,14 +44,14 @@ class Report:
             self, 
             duplicatePages: bool = False, 
             pageOrder: list = None,
-            styleFile: str = None,
+            style_file: str = None,
             startActive: bool = False,
         ):
         '''
         duplicatePages: Allow for the program to create multiple pages for 
                         files that have the same name.
         pageOrder:      Order that the pages should appear in, using the names of the page.
-        styleFile:      Name of the .html file that specifies the styles to use. If none is 
+        style_file:      Name of the .html file that specifies the styles to use. If none is 
                         defined, uses the default styles. 
         startActive:    True / False option. If True, reports will default to generating the
                         html code. 
@@ -62,15 +62,15 @@ class Report:
         self.ss = self.session_state
         
         # Inititialization
-        self.styleFile = styleFile
-        self.init('htmlReport', startActive)
-        self.init('html', htmlClass.html(self.styleFile))
+        self.style_file = style_file
+        self.init('html_report', startActive)
+        self.init('html', htmlClass.html(self.style_file))
         self.duplicatePages = duplicatePages
 
         # Redefine page numbers
         self.init('streamlit_report-htmlRedefinePages', {})
         self.redefine = self.ss['streamlit_report-htmlRedefinePages']
-        self.scriptHash = None
+        self.script_hash = None
         self.nav = False
         
         # If we already have an html report going, preserve it
@@ -78,17 +78,17 @@ class Report:
 
         # Get and store the name of the current page
         try:
-            self.html.pageName = self.pageName()
+            self.html.page_name = self.page_name()
         except:
             # If we're using the navigation options we'll have to keep track of script hashes
             ctx = get_script_run_ctx()
-            self.scriptHash = ctx.page_script_hash
+            self.script_hash = ctx.page_script_hash
 
             # Check if we've already redefined the hash
-            if self.scriptHash in self.redefine:
-                self.html.pageName = self.redefine[self.scriptHash]
+            if self.script_hash in self.redefine:
+                self.html.page_name = self.redefine[self.script_hash]
             else:
-                self.html.pageName = self.scriptHash
+                self.html.page_name = self.script_hash
 
         # Clear the page data if we're regenerating the code
         self.html.increment(self.duplicatePages)
@@ -103,13 +103,13 @@ class Report:
         self.heading = "###"
 
         # Define the text to display after a selection field
-        self.reportLabel = ' selection:'
+        self.report_label = ' selection:'
 
         # Define the text to display after a text field
         self.textLabel = ' input:'
 
         # Optional Function to convert dates
-        self.dateFormatFunc = None
+        self.date_format_func = None
 
 
     def init(self, variable: str, value: Any) -> None:
@@ -117,7 +117,7 @@ class Report:
         if variable not in self.ss:
             self.ss[variable] = value
 
-    def pageName(self) -> str:
+    def page_name(self) -> str:
         '''Gets and returns the filename of the running page'''
         # Modified code from blackary in discussion link below...
         # https://discuss.streamlit.io/t/how-can-i-learn-what-page-i-am-looking-at/56980/2
@@ -151,7 +151,7 @@ class Report:
         st.write(text, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.write(text)
 
     def markdown(self, text: 'str', **kwargs) -> None:
@@ -160,7 +160,7 @@ class Report:
         st.markdown(text, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             
             # If we're allowing unsafe html, write to the report directly
             # NOTE: Removed explicit callout for standard streamlit usage
@@ -186,7 +186,7 @@ class Report:
         st.dataframe(df, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.dataframe(df, height, width)
 
     def selectbox(self, label: str, options: list, **kwargs) -> str:
@@ -195,8 +195,8 @@ class Report:
         selection = st.selectbox(label, options, **kwargs)
         
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+        if self.ss['html_report'] and self.ignore == False:
+            self.html.write(f"{self.heading} {label}{self.report_label}")
             if selection:
                 self.html.write(f"{selection}")
             else:
@@ -216,8 +216,8 @@ class Report:
         values = st.multiselect(label, options = options, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+        if self.ss['html_report'] and self.ignore == False:
+            self.html.write(f"{self.heading} {label}{self.report_label}")
             if len(values) > 0:
                 # Write each selection as a comma separated list
                 self.html.write(f"{', '.join(str(item) for item in values)}")
@@ -233,7 +233,7 @@ class Report:
         st.text(body, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.write(f'{body}')
     
     def text_area(self, label: str, **kwargs) -> str:
@@ -242,7 +242,7 @@ class Report:
         value = st.text_area(label, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.write(f'{self.heading} {label}{self.textLabel}')
             if value:
                 self.html.write(f'{value}')
@@ -257,7 +257,7 @@ class Report:
         value = st.text_input(label, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.write(f'{self.heading} {label}{self.textLabel}')
             if value:
                 self.html.write(f'{value}')
@@ -272,8 +272,8 @@ class Report:
         result = st.slider(label, **kwargs)
 
         # If we're making a report, add to it
-        if self.ss['htmlReport'] and self.ignore == False:
-            self.html.write(f"{self.heading} {label}{self.reportLabel}")
+        if self.ss['html_report'] and self.ignore == False:
+            self.html.write(f"{self.heading} {label}{self.report_label}")
             
             # Check if we have a range of results
             if 'value' in kwargs and type(kwargs['value']) == tuple:
@@ -288,25 +288,25 @@ class Report:
     
     def date_input(self, label, **kwargs):
         '''Mimics st.date_input
-        dateFormatFunc: Optional function to convert the date into
+        date_format_func: Optional function to convert the date into
                         a different format'''
         # streamlit
         value = st.date_input(label, **kwargs)
 
         # If we're making a report... convert the date
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             
             # Process using the given function if provided 
-            if self.dateFormatFunc:
-                newValue = self.dateFormatFunc(value)
+            if self.date_format_func:
+                new_value = self.date_format_func(value)
 
             # Otherwise convert to a string
             else:
-                newValue = str(value)
+                new_value = str(value)
 
             # Add to the report
-            self.html.write(f"{self.heading} {label}{self.reportLabel}")
-            self.html.write(f"{newValue}")  
+            self.html.write(f"{self.heading} {label}{self.report_label}")
+            self.html.write(f"{new_value}")  
 
         # Return the st output
         return value  
@@ -321,19 +321,19 @@ class Report:
         self.nav = True
         
         # Check if we're already redefined this item
-        if nav.title not in redefine and self.scriptHash:
-            redefine[self.scriptHash] = nav.title
+        if nav.title not in redefine and self.script_hash:
+            redefine[self.script_hash] = nav.title
 
-            # For all items to redefine, change the pageNames
+            # For all items to redefine, change the page_names
             replace = None
-            for pageName, pageNumber in self.html.pageNames.items():
-                if pageName == self.scriptHash:
-                    replace = pageName
+            for page_name, page_number in self.html.page_names.items():
+                if page_name == self.script_hash:
+                    replace = page_name
                     break
 
             # Replace the item
             if replace:
-                self.html.pageNames[redefine[replace]] = self.html.pageNames.pop(replace)
+                self.html.page_names[redefine[replace]] = self.html.page_names.pop(replace)
 
         return nav
 
@@ -347,46 +347,46 @@ class Report:
             yield
         self.html.side = False
     
-    def tabs(self, items: 'list', displayIndex: 'int' = 0, **kwargs):
+    def tabs(self, items: 'list', display_index: 'int' = 0, **kwargs):
         '''Mimics the functionality of st.tabs
         NOTE: For the html report it will default to setting the first tab active'''
         # Get the current tab count
-        n = self.html.tabCount + 1
+        n = self.html.tab_count + 1
         
         # Create the html tab buttons, if we're creating a report
-        if self.ss['htmlReport'] and self.ignore == False:
+        if self.ss['html_report'] and self.ignore == False:
             self.html.tabBar(items)
 
         # streamlit
         # Create the tabs
-        streamlitTabs = zip(st.tabs(items, **kwargs))
-        tabsList = []
+        streamlit_tabs = zip(st.tabs(items, **kwargs))
+        tabs_list = []
 
         # Create the tab group name
-        group = f"group_{self.html.tabGroup}_tablink"
+        group = f"group_{self.html.tab_group}_tablink"
         
         # Unzip the items and write to each of them
         i = 0
-        for item in streamlitTabs:
+        for item in streamlit_tabs:
             # Append to our tabs
             id = f"page_{self.html.page}_{items[i]}_{n}"
 
-            # If i == displayIndex then we want to show the tab
-            if i == displayIndex:
+            # If i == display_index then we want to show the tab
+            if i == display_index:
                 display = ''
             # Otherwise, hide the tab
             else:
                 display = 'style = "display:none"'
 
             # Add and create the tab
-            tabsList.append(tab(item[0], self, id, group, display))
+            tabs_list.append(tab(item[0], self, id, group, display))
 
             # Increment i & n so we can keep track of the tab index
             i += 1
             n += 1
 
         # Yield function
-        for t in tabsList:
+        for t in tabs_list:
             yield t.combo
 
     def altair_chart(self, chart: altair.Chart, **kwargs) -> None: # type: ignore
@@ -395,39 +395,39 @@ class Report:
         st.altair_chart(chart, **kwargs)
 
         # HTML
-        if self.ss['htmlReport'] and self.ignore == False:
-            self.html.altairChart(chart)
+        if self.ss['html_report'] and self.ignore == False:
+            self.html.altair_chart(chart)
 
-    def download(self, reportName: 'str' = 'output') -> None:
+    def download(self, report_name: 'str' = 'output') -> None:
         '''
         Runs the application and downloads the html
-            reportName: Name of the report when generated
+            report_name: Name of the report when generated
         '''
         # If the flag is on, create the report
-        if self.ss['htmlReport'] == True:
+        if self.ss['html_report'] == True:
             # Make the report...
-            self.html.generateReport()
+            self.html.generate_report()
 
             # Download button
-            st.download_button("Download!", self.html.report, f'{reportName}.html')
+            st.download_button("Download!", self.html.report, f'{report_name}.html')
             helpText = "Stopping report generation can improve application speeds"
-            st.button('Stop Report Generation', on_click = self.generateReport, help = helpText)
+            st.button('Stop Report Generation', on_click = self.generate_report, help = helpText)
         else:
             # Otherwise ask to download
-            st.button('Generate Report?', on_click = self.generateReport)
+            st.button('Generate Report?', on_click = self.generate_report)
     
-    def generateReport(self) -> None:
+    def generate_report(self) -> None:
         '''Alternates the report generate value'''
         # If we're not generating a report, clear the saved html code
-        if self.ss['htmlReport'] == True:
-            self.ss['htmlReport'] = False
-            self.ss.html = htmlClass.html(styleFile = self.styleFile)
+        if self.ss['html_report'] == True:
+            self.ss['html_report'] = False
+            self.ss.html = htmlClass.html(style_file = self.style_file)
         else:
-            self.ss['htmlReport'] = True
+            self.ss['html_report'] = True
 
 class tab:
-    def __init__(self, stTab, report, id, group, display):
-        self.stTab = stTab
+    def __init__(self, st_tab, report, id, group, display):
+        self.st_tab = st_tab
         self.report = report
         self.html = report.html
         self.id = id
@@ -441,21 +441,21 @@ class tab:
         code = f'''<div id = "{self.id}" class = "{self.group}" {self.display}>'''
 
         # Only write the code if we're not ignoreing right now
-        if self.report.ss['htmlReport'] and self.report.ignore == False:
+        if self.report.ss['html_report'] and self.report.ignore == False:
             self.html.html(code)
 
         # Activate the tab block
-        self.html.tabID = self.id
+        self.html.tab_id = self.id
 
         # Yield for streamlit
-        yield self.stTab
+        yield self.st_tab
 
         # Close the div block (if we're not ignoring)
-        if self.report.ss['htmlReport'] and self.report.ignore == False:
+        if self.report.ss['html_report'] and self.report.ignore == False:
             self.html.html('</div>')
 
     @property
     @contextmanager
     def combo(self):
-        with self.tab, self.stTab:
+        with self.tab, self.st_tab:
             yield
