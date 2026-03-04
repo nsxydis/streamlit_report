@@ -439,13 +439,14 @@ class Report:
     def plotly_chart(
             self, 
             chart, 
-            override_streamlit_colors: bool = True,
+            override_streamlit_colors: str = 'plotly',
             **kwargs
             ) -> DeltaGenerator:
         '''
         Plot a plotly chart
             chart:  Plotly chart
-            override_streamlit_colors:  True/False -- If true, will override the default streamlit color scheme.
+            override_streamlit_colors:  Pass None, False, or '' to skip. Alternatively, pass the
+                                        desired plotly theme template. Defaults to 'plotly'
                                         NOTE: This is required because streamlit will override plotly colors and
                                         result in a black/white html output if not overridden.
                                         NOTE: This may result in the colors displaying on streamlit to change
@@ -456,8 +457,8 @@ class Report:
 
         # If we're overriding streamlit's color scheme, do so here
         if override_streamlit_colors:
-            import plotly.io as pio
-            pio.templates.default = 'plotly'
+            # This will apply the plotly theme template
+            chart = chart.update_layout(template = override_streamlit_colors)
         
         # Show the plotly chart
         chart_state = st.plotly_chart(chart, **kwargs)
