@@ -19,12 +19,12 @@ Author: Nick Xydis
 '''
 # Type hints & versioning
 from __future__ import annotations
+from typing import Any
 from packaging.version import Version
 from streamlit.navigation.page import StreamlitPage
 from streamlit.delta_generator import DeltaGenerator
 
 # Standard imports
-from pathlib import Path
 import streamlit as st
 
 # Streamlit imports
@@ -233,6 +233,15 @@ class Report:
 
     def help_text(self, label: str, help_info: str, **kwargs) -> None:
         '''Inserts a question mark with hover text to the dashboard & report'''
+        # If the css was not already loaded, reload the page
+        if self.session_state['add_help_css'] == False:
+            
+            # Set the help text to true in the session state
+            self.session_state['add_help_css'] = True
+
+            # Add the CSS code
+            self.st_add_help_css()
+
         # Note that we're adding help text
         self.session_state['add_help_css'] = True
 
@@ -254,7 +263,7 @@ class Report:
         </label>
         '''
 
-        # Use the markdown function to display the html
+        # Display on streamlit with unsafe html and add to the report
         self.markdown(tooltip_html, unsafe_allow_html=True)
 
     def dataframe(
@@ -498,7 +507,12 @@ class Report:
             self.html.generate_report()
 
             # Download button
-            st.download_button("Download!", self.html.report, f'{report_name}.html')
+            st.download_button(
+                label="Download!", 
+                data=self.html.report, 
+                file_name=f'{report_name}.html',
+                # mime='text/html'
+            )
             helpText = "Stopping report generation can improve application speeds"
             st.button('Stop Report Generation', on_click = self.generate_report, help = helpText)
         else:

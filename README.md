@@ -27,7 +27,14 @@ The below features are simplified representations of what the dashboard presents
 
 ## Version 0.1.0
 - Added plotly support
+```python
+r.plotly_chart(chart)
+```
 - Added question-mark hover text
+```python
+r.help_text("# Section header", "Explanation that reveals key insights")
+```
+- 
 
 ## Version 0.0.7
 - updated default style.html file to improve dataframe display on reports
