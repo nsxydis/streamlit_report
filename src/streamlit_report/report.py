@@ -255,7 +255,7 @@ class Report:
         '''
 
         # Use the markdown function to display the html
-        self.markdown(tooltip_html, **kwargs)
+        self.markdown(tooltip_html, unsafe_allow_html=True)
 
     def dataframe(
             self, 
