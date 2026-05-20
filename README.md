@@ -25,6 +25,10 @@ The below features are simplified representations of what the dashboard presents
 
 # Version History
 
+## Version 0.1.0
+- Added plotly support
+- Added question-mark hover text
+
 ## Version 0.0.7
 - updated default style.html file to improve dataframe display on reports
 - removed height & width functionality from r.dataframe commands

@@ -80,6 +80,13 @@ class Report:
         self.redefine = self.ss['streamlit_report-htmlRedefinePages']
         self.script_hash = None
         self.nav = False
+
+        # Help text css
+        self.init('add_help_css', False)
+        
+        # If we do have help text, add the css code at the top 
+        if self.session_state['add_help_css'] == True:
+            self.st_add_help_css()
         
         # If we already have an html report going, preserve it
         self.html: htmlClass.html = self.ss.html
@@ -178,6 +185,77 @@ class Report:
             # Otherwise, write to the report
             else:
                 self.html.write(text)
+
+    def st_add_help_css(self):
+        '''Adds the css code to streamlit if we're using help-text'''
+        css = '''
+<style>
+  .help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #888;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: help;
+    position: relative;
+  }
+
+  .help .tooltiptext {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    white-space: pre;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 13px;
+    font-weight: normal;
+  }
+
+  .help:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+</style>
+'''
+        # Add the css code
+        st.markdown(css, unsafe_allow_html = True)
+
+    def help_text(self, label: str, help_info: str, **kwargs) -> None:
+        '''Inserts a question mark with hover text to the dashboard & report'''
+        # Note that we're adding help text
+        self.session_state['add_help_css'] = True
+
+        import markdown
+        # Convert the label using markdown
+        mark_down_label = markdown.markdown(label)
+
+        # Extract the closing markdown block
+        x = mark_down_label.index('</')
+
+        # Build the tooltip HTML
+        tooltip_html = f'''
+        <label>
+        {mark_down_label[:x]}
+            <span class="help">?
+                <span class="tooltiptext">{help_info}</span>
+            </span>
+        {mark_down_label[x:]}
+        </label>
+        '''
+
+        # Use the markdown function to display the html
+        self.markdown(tooltip_html, **kwargs)
 
     def dataframe(
             self, 
