@@ -1,25 +1,39 @@
 [project]
 name = "streamlit-report"
-version = "0.0.9"
-description = ""
+version = "0.1.0"
+description = "Package used to create reports from streamlit dashboards"
 authors = [
     {name = "Nick Xydis",email = "nsxydis@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.9"   # Tested with 3.13.3
+license = 'Apache-2.0'
+license-files = ["LICENSE"]
 
 # NOTE: Some versions may not be compatible
 dependencies = [
     "polars",   # Tested with 1.31.0
     "markdown", # Tested with 3.8.2
-    "altair",   # Tested with 5.5.0
     "streamlit", # Tested with 1.46.1
-    "plotly[express]", # Tested with 6.5.2
 ]
+
+# Optional dependencies
+[dependency-groups]
+altair = ["altair"]
+plotly = ["plotly"]
+
+# Dev testing includes all optional installs
+dev = [
+    { include-group = "altair"},    # Tested with 5.5.0
+    { include-group = "plotly"},    # Tested with 6.5.2
+]
+
 
 [tool.poetry]
 packages = [{include = "streamlit_report", from = "src"}]
 
+[project.urls]
+repository = "https://github.com/nsxydis/streamlit_report"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -202,4 +202,42 @@ Based off examples found at: https://www.w3schools.com/
     .sidenav a {font-size: 18px;}
     }
 
+    /* Style settings for ? and hover text */
+    .help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #888;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: help;
+    position: relative;
+  }
+
+  .help .tooltiptext {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    white-space: pre;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 13px;
+    font-weight: normal;
+  }
+
+  .help:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
 </style>
